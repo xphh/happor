@@ -10,32 +10,53 @@
 		http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-3.0.xsd">
 
 	<context:annotation-config />
-	
+
 	<bean id="server" class="cn.lechange.happor.HapporWebserver">
 		<property name="port" value="8080" />
 	</bean>
 
 	<bean id="channelInitializer" class="cn.lechange.happor.HapporChannelInitializer">
-		<property name="executeThreads" value="200" /> 
-		<property name="maxHttpSize" value="20000000" /> 
-		<lookup-method name="getControllerContainer" bean="controllerContainer"/>
+		<property name="executeThreads" value="200" />
+		<property name="maxHttpSize" value="20000000" />
+		<lookup-method name="getControllerContainer" bean="controllerContainer" />
 	</bean>
 
-	<bean id="controllerContainer" class="cn.lechange.happor.ControllerContainer" scope="prototype">
+	<bean id="controllerContainer" class="cn.lechange.happor.ControllerContainer"
+		scope="prototype">
 		<property name="controllers">
 			<list>
 				<!-- add your controller into netty channel pipeline -->
-				<ref bean="testWebController" />
+				<ref bean="testIncomingFilter" />
+				<ref bean="testNormalHandler" />
+				<ref bean="testAsyncHandler" />
+				<ref bean="defaultlHandler" />
 			</list>
 		</property>
 	</bean>
-	
+
 	<!-- define your controllers below -->
-	<bean id="testWebController" class="cn.lechange.happor.TestWebController" scope="prototype">
+	<bean id="testNormalHandler" class="cn.lechange.happor.TestNormalHandler"
+		scope="prototype">
 		<property name="method" value="GET" />
 		<property name="uriPattern" value="^/test" />
 	</bean>
 
-	<!-- other beans here -->
-	
+	<bean id="testAsyncHandler" class="cn.lechange.happor.TestAsyncHandler"
+		scope="prototype">
+		<property name="method" value="GET" />
+		<property name="uriPattern" value="^/async" />
+	</bean>
+
+	<bean id="defaultlHandler" class="cn.lechange.happor.DefaultlHandler"
+		scope="prototype">
+		<property name="uriPattern" value=".*" />
+	</bean>
+
+	<bean id="testIncomingFilter" class="cn.lechange.happor.TestIncomingFilter"
+		scope="prototype">
+		<property name="uriPattern" value=".*" />
+	</bean>
+
+		<!-- other beans here -->
+
 </beans>

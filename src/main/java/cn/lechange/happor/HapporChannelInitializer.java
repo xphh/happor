@@ -4,6 +4,8 @@ import java.util.List;
 
 import org.apache.log4j.Logger;
 
+import cn.lechange.happor.controller.HttpController;
+
 import io.netty.channel.ChannelInitializer;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.handler.codec.http.HttpObjectAggregator;
@@ -57,16 +59,14 @@ public class HapporChannelInitializer extends
 				.addLast(new HttpResponseEncoder())
 				.addLast(new HttpObjectAggregator(getMaxHttpSize()));
 
-		List<HttpBaseController> controllers = getControllerContainer().getControllers();
+		List<HttpController> controllers = getControllerContainer().getControllers();
 		if (controllers != null) {
-			for (HttpBaseController controller : controllers) {
+			for (HttpController controller : controllers) {
 				logger.debug("add controller: " + controller.getMethod() + " "
 						+ controller.getUriPattern());
 				ch.pipeline().addLast(getGroup(), controller);
 			}
 		}
-
-		ch.pipeline().addLast(getGroup(), new DefaultHttpHandler());
 	}
 
 }

@@ -2,15 +2,17 @@ package cn.lechange.happor;
 
 import java.util.List;
 
+import cn.lechange.happor.controller.HttpController;
+
 public class ControllerContainer {
 
-	private List<HttpBaseController> controllers;
+	private List<HttpController> controllers;
 
-	public List<HttpBaseController> getControllers() {
+	public List<HttpController> getControllers() {
 		return controllers;
 	}
 
-	public void setControllers(List<HttpBaseController> controllers) {
+	public void setControllers(List<HttpController> controllers) {
 		this.controllers = controllers;
 	}
 	

@@ -45,7 +45,7 @@ public class HapporWebserver {
 
 			// Bind and start to accept incoming connections.
 			ChannelFuture f = b.bind(port).sync(); // (7)
-			logger.info("FileUploadServer start @port[" + port + "] OK!");
+			logger.info("HttpServer start @port[" + port + "] OK!");
 
 			// Wait until the server socket is closed.
 			// In this example, this does not happen, but you can do that to
@@ -54,7 +54,7 @@ public class HapporWebserver {
 		} catch (InterruptedException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
-			logger.error("FileUploadServer start @port[" + port + "] FAIL!");
+			logger.error("HttpServer start @port[" + port + "] FAIL!");
 		} finally {
 			workerGroup.shutdownGracefully();
 			bossGroup.shutdownGracefully();
