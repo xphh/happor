@@ -9,7 +9,7 @@ import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.http.FullHttpRequest;
 import io.netty.handler.codec.http.FullHttpResponse;
 
-public abstract class HttpController extends HttpRootController {
+public abstract class HttpController {
 
 	private static Logger logger = Logger.getLogger(HttpRootController.class);
 
