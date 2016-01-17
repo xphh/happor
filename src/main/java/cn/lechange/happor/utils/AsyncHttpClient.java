@@ -73,7 +73,7 @@ public class AsyncHttpClient {
 						Callback cb = ctx.channel().attr(KEY_CB).get();
 						FullHttpRequest request = ctx.channel().attr(KEY_REQ).get();
 						logger.info("recv http response[" + request.getUri() + "] " + response.getStatus());
-						cb.onResponse(response.copy());
+						cb.onResponse(response);
 						ctx.channel().close();
 					}
 

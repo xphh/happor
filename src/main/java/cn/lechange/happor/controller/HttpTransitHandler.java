@@ -12,14 +12,19 @@ public abstract class HttpTransitHandler extends HttpAsyncHandler {
 	@Autowired
 	private AsyncHttpClient httpClient;
 	
+	private FullHttpRequest transRequest;
+	private FullHttpResponse transResponse;
+	
 	@Override
 	protected void handle(FullHttpRequest request, FullHttpResponse response) {
 		// TODO Auto-generated method stub
-		incoming(request);
+		transRequest = request.retain();
+		incoming(transRequest);
 	}
 	
 	protected void transit(String host, int port) {
-		httpClient.sendRequest(host, port, request.copy(), new AsyncHttpClient.Callback() {
+		
+		httpClient.sendRequest(host, port, transRequest, new AsyncHttpClient.Callback() {
 			
 			public void onConnectFail() {
 				// TODO Auto-generated method stub
@@ -33,7 +38,8 @@ public abstract class HttpTransitHandler extends HttpAsyncHandler {
 			
 			public void onResponse(FullHttpResponse response) {
 				// TODO Auto-generated method stub
-				outgoing(response);
+				transResponse = response.retain();
+				outgoing(transResponse);
 				finish(response);
 			}
 
