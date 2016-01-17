@@ -1,11 +1,5 @@
 package cn.lechange.happor;
 
-import java.util.List;
-
-import org.apache.log4j.Logger;
-
-import cn.lechange.happor.controller.HttpController;
-
 import io.netty.channel.ChannelInitializer;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.handler.codec.http.HttpObjectAggregator;
@@ -16,9 +10,6 @@ import io.netty.util.concurrent.EventExecutorGroup;
 
 public class HapporChannelInitializer extends
 		ChannelInitializer<SocketChannel> {
-
-	private static Logger logger = Logger
-			.getLogger(HapporChannelInitializer.class);
 
     private EventExecutorGroup group;
 
@@ -47,26 +38,14 @@ public class HapporChannelInitializer extends
 	public void setMaxHttpSize(int maxHttpSize) {
 		this.maxHttpSize = maxHttpSize;
 	}
-
-	public ControllerContainer getControllerContainer() {
-		return new ControllerContainer();
-	}
-
+	
 	@Override
 	protected void initChannel(SocketChannel ch) throws Exception {
 		// TODO Auto-generated method stub
 		ch.pipeline().addLast(new HttpRequestDecoder())
 				.addLast(new HttpResponseEncoder())
-				.addLast(new HttpObjectAggregator(getMaxHttpSize()));
-
-		List<HttpController> controllers = getControllerContainer().getControllers();
-		if (controllers != null) {
-			for (HttpController controller : controllers) {
-				logger.debug("add controller: " + controller.getMethod() + " "
-						+ controller.getUriPattern());
-				ch.pipeline().addLast(getGroup(), controller);
-			}
-		}
+				.addLast(new HttpObjectAggregator(getMaxHttpSize()))
+				.addLast(new HttpRootController());
 	}
 
 }

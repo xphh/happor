@@ -2,46 +2,19 @@ package cn.lechange.happor.controller;
 
 import org.apache.log4j.Logger;
 
-import io.netty.channel.Channel;
+import cn.lechange.happor.HttpRootController;
+
 import io.netty.channel.ChannelFutureListener;
 import io.netty.channel.ChannelHandlerContext;
-import io.netty.channel.ChannelInboundHandlerAdapter;
-import io.netty.handler.codec.http.DefaultFullHttpResponse;
 import io.netty.handler.codec.http.FullHttpRequest;
 import io.netty.handler.codec.http.FullHttpResponse;
-import io.netty.handler.codec.http.HttpResponseStatus;
 
-public abstract class HttpController extends ChannelInboundHandlerAdapter {
+public abstract class HttpController extends HttpRootController {
 
-	private static Logger logger = Logger.getLogger(HttpController.class);
+	private static Logger logger = Logger.getLogger(HttpRootController.class);
 
 	private String method;
 	private String uriPattern;
-
-	@Override
-	public void channelRead(ChannelHandlerContext ctx, Object msg)
-			throws Exception {
-		// TODO Auto-generated method stub
-		if (msg instanceof FullHttpRequest) {
-			channel = ctx.channel();
-			request = (FullHttpRequest) msg;
-			if ((method == null || request.getMethod().name().equals(method))
-					&& request.getUri().matches(uriPattern)) {
-				logger.info("HTTP[" + request.getMethod() + " "
-						+ request.getUri() + " " + request.getProtocolVersion()
-						+ "] => " + getClass().getSimpleName());
-
-				FullHttpResponse response = new DefaultFullHttpResponse(
-						request.getProtocolVersion(), HttpResponseStatus.OK);
-				boolean isEnd = handleRequest(request, response);
-				if (!isEnd) {
-					ctx.fireChannelRead(msg);
-				}
-			} else {
-				ctx.fireChannelRead(msg);
-			}
-		}
-	}
 
 	public String getMethod() {
 		return method;
@@ -58,23 +31,30 @@ public abstract class HttpController extends ChannelInboundHandlerAdapter {
 	public void setUriPattern(String uriPattern) {
 		this.uriPattern = uriPattern;
 	}
+	
+	private ChannelHandlerContext ctx;
+	private FullHttpRequest request;
+	
+	final public boolean input(ChannelHandlerContext ctx, FullHttpRequest request,
+			FullHttpResponse response) {
+		this.ctx = ctx;
+		this.request = request;
+		return handleRequest(request, response);
+	}
 
-	protected abstract boolean handleRequest(FullHttpRequest request,
-			FullHttpResponse response);
-
-	protected Channel channel;
-	protected FullHttpRequest request;
-
-	protected void finish(FullHttpResponse response) {
+	final protected void finish(FullHttpResponse response) {
 		if (response != null) {
 			logger.info("HTTP[" + request.getMethod() + " " + request.getUri()
 					+ " " + request.getProtocolVersion() + "] response " + response.getStatus());
-			channel.writeAndFlush(response)
+			ctx.channel().writeAndFlush(response)
 					.addListener(ChannelFutureListener.CLOSE);
 		} else {
-			channel.close();
+			ctx.channel().close();
 		}
 		request.release();
 	}
+
+	protected abstract boolean handleRequest(FullHttpRequest request,
+			FullHttpResponse response);
 
 }

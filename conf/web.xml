@@ -18,7 +18,6 @@
 	<bean id="channelInitializer" class="cn.lechange.happor.HapporChannelInitializer">
 		<property name="executeThreads" value="50" />
 		<property name="maxHttpSize" value="20000000" />
-		<lookup-method name="getControllerContainer" bean="controllerContainer" />
 	</bean>
 
 	<bean id="asyncHttpClient" class="cn.lechange.happor.utils.AsyncHttpClient">
@@ -26,21 +25,12 @@
 		<property name="maxHttpSize" value="20000000" />
 	</bean>
 
-	<bean id="controllerContainer" class="cn.lechange.happor.ControllerContainer"
+	<!-- define your controllers below -->
+	<bean id="testIncomingFilter" class="cn.lechange.happor.TestIncomingFilter"
 		scope="prototype">
-		<property name="controllers">
-			<list>
-				<!-- add your controller into netty channel pipeline -->
-				<ref bean="testIncomingFilter" />
-				<ref bean="testNormalHandler" />
-				<ref bean="testAsyncHandler" />
-				<ref bean="testTransitHandler" />
-				<ref bean="defaultlHandler" />
-			</list>
-		</property>
+		<property name="uriPattern" value=".*" />
 	</bean>
 
-	<!-- define your controllers below -->
 	<bean id="testNormalHandler" class="cn.lechange.happor.TestNormalHandler"
 		scope="prototype">
 		<property name="method" value="GET" />
@@ -53,21 +43,16 @@
 		<property name="uriPattern" value="^/async" />
 	</bean>
 
-	<bean id="defaultlHandler" class="cn.lechange.happor.DefaultlHandler"
-		scope="prototype">
-		<property name="uriPattern" value=".*" />
-	</bean>
-
-	<bean id="testIncomingFilter" class="cn.lechange.happor.TestIncomingFilter"
-		scope="prototype">
-		<property name="uriPattern" value=".*" />
-	</bean>
-
 	<bean id="testTransitHandler" class="cn.lechange.happor.TestTransitHandler"
 		scope="prototype">
 		<property name="uriPattern" value="^/trans" />
 	</bean>
 
-		<!-- other beans here -->
+	<bean id="defaultlHandler" class="cn.lechange.happor.DefaultlHandler"
+		scope="prototype">
+		<property name="uriPattern" value=".*" />
+	</bean>
+
+	<!-- other beans here -->
 
 </beans>
