@@ -16,9 +16,14 @@
 	</bean>
 
 	<bean id="channelInitializer" class="cn.lechange.happor.HapporChannelInitializer">
-		<property name="executeThreads" value="200" />
+		<property name="executeThreads" value="50" />
 		<property name="maxHttpSize" value="20000000" />
 		<lookup-method name="getControllerContainer" bean="controllerContainer" />
+	</bean>
+
+	<bean id="asyncHttpClient" class="cn.lechange.happor.utils.AsyncHttpClient">
+		<property name="timeout" value="30" />
+		<property name="maxHttpSize" value="20000000" />
 	</bean>
 
 	<bean id="controllerContainer" class="cn.lechange.happor.ControllerContainer"
@@ -29,6 +34,7 @@
 				<ref bean="testIncomingFilter" />
 				<ref bean="testNormalHandler" />
 				<ref bean="testAsyncHandler" />
+				<ref bean="testTransitHandler" />
 				<ref bean="defaultlHandler" />
 			</list>
 		</property>
@@ -55,6 +61,11 @@
 	<bean id="testIncomingFilter" class="cn.lechange.happor.TestIncomingFilter"
 		scope="prototype">
 		<property name="uriPattern" value=".*" />
+	</bean>
+
+	<bean id="testTransitHandler" class="cn.lechange.happor.TestTransitHandler"
+		scope="prototype">
+		<property name="uriPattern" value="^/trans" />
 	</bean>
 
 		<!-- other beans here -->

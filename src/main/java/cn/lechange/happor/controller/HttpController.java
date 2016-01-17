@@ -2,6 +2,7 @@ package cn.lechange.happor.controller;
 
 import org.apache.log4j.Logger;
 
+import io.netty.channel.Channel;
 import io.netty.channel.ChannelFutureListener;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
@@ -22,7 +23,7 @@ public abstract class HttpController extends ChannelInboundHandlerAdapter {
 			throws Exception {
 		// TODO Auto-generated method stub
 		if (msg instanceof FullHttpRequest) {
-			channel = ctx;
+			channel = ctx.channel();
 			request = (FullHttpRequest) msg;
 			if ((method == null || request.getMethod().name().equals(method))
 					&& request.getUri().matches(uriPattern)) {
@@ -61,14 +62,18 @@ public abstract class HttpController extends ChannelInboundHandlerAdapter {
 	protected abstract boolean handleRequest(FullHttpRequest request,
 			FullHttpResponse response);
 
-	private ChannelHandlerContext channel;
-	private FullHttpRequest request;
+	protected Channel channel;
+	protected FullHttpRequest request;
 
 	protected void finish(FullHttpResponse response) {
-		logger.info("HTTP[" + request.getMethod() + " " + request.getUri()
-				+ " " + request.getProtocolVersion() + "] response " + response.getStatus());
-		channel.writeAndFlush(response)
-				.addListener(ChannelFutureListener.CLOSE);
+		if (response != null) {
+			logger.info("HTTP[" + request.getMethod() + " " + request.getUri()
+					+ " " + request.getProtocolVersion() + "] response " + response.getStatus());
+			channel.writeAndFlush(response)
+					.addListener(ChannelFutureListener.CLOSE);
+		} else {
+			channel.close();
+		}
 		request.release();
 	}
 
