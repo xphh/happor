@@ -13,6 +13,12 @@ public abstract class HttpAsyncHandler extends HttpController {
 		return true;
 	}
 
+	@Override
+	protected void handleResponse(FullHttpResponse response) {
+		// TODO Auto-generated method stub
+		
+	}
+
 	protected abstract void handle(FullHttpRequest request,
 			FullHttpResponse response);
 

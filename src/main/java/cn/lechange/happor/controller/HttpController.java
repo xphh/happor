@@ -2,8 +2,6 @@ package cn.lechange.happor.controller;
 
 import org.apache.log4j.Logger;
 
-import cn.lechange.happor.HttpRootController;
-
 import io.netty.channel.ChannelFutureListener;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.http.FullHttpRequest;
@@ -11,7 +9,7 @@ import io.netty.handler.codec.http.FullHttpResponse;
 
 public abstract class HttpController {
 
-	private static Logger logger = Logger.getLogger(HttpRootController.class);
+	private static Logger logger = Logger.getLogger(HttpController.class);
 
 	private String method;
 	private String uriPattern;
@@ -37,12 +35,24 @@ public abstract class HttpController {
 	
 	final public boolean input(ChannelHandlerContext ctx, FullHttpRequest request,
 			FullHttpResponse response) {
+		logger.info("HTTP[" + request.getMethod() + " "
+				+ request.getUri() + " " + request.getProtocolVersion()
+				+ "] => " + this + " [ from " + prev + " ]");
 		this.ctx = ctx;
 		this.request = request;
 		return handleRequest(request, response);
 	}
-
-	final protected void finish(FullHttpResponse response) {
+	
+	final public void output(FullHttpResponse response) {
+		handleResponse(response);
+	}
+	
+	private HttpController prev;
+	final public void setPrev(HttpController controller) {
+		prev = controller;
+	}
+	
+	private void realFinish(FullHttpResponse response) {
 		if (response != null) {
 			logger.info("HTTP[" + request.getMethod() + " " + request.getUri()
 					+ " " + request.getProtocolVersion() + "] response " + response.getStatus());
@@ -54,7 +64,17 @@ public abstract class HttpController {
 		request.release();
 	}
 
+	final protected void finish(FullHttpResponse response) {
+		handleResponse(response);
+		if (prev == null) {
+			realFinish(response);
+		} else {
+			prev.finish(response);
+		}
+	}
+
 	protected abstract boolean handleRequest(FullHttpRequest request,
 			FullHttpResponse response);
+	protected abstract void handleResponse(FullHttpResponse response);
 
 }
