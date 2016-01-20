@@ -64,7 +64,7 @@ public abstract class HttpController {
 		request.release();
 	}
 
-	final protected void finish(FullHttpResponse response) {
+	protected void finish(FullHttpResponse response) {
 		handleResponse(response);
 		if (prev == null) {
 			realFinish(response);
