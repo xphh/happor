@@ -28,8 +28,16 @@ public class HapporWebserver {
 	
 	@Autowired
 	private HapporChannelInitializer channelInitializer;
+	
+	private HapporContext ctx;
+	
+	public HapporContext getContext() {
+		return ctx;
+	}
 
-	public void startup() {
+	public void startup(HapporContext ctx) {
+		this.ctx = ctx;
+		
 		EventLoopGroup bossGroup = new NioEventLoopGroup(1);
 		EventLoopGroup workerGroup = new NioEventLoopGroup();
 		try {
@@ -46,6 +54,11 @@ public class HapporWebserver {
 			// Bind and start to accept incoming connections.
 			ChannelFuture f = b.bind(port).sync(); // (7)
 			logger.info("HttpServer start @port[" + port + "] OK!");
+			
+			WebserverHandler handler = ctx.getWebserverHandler();
+			if (handler != null) {
+				handler.onInit();
+			}
 
 			// Wait until the server socket is closed.
 			// In this example, this does not happen, but you can do that to

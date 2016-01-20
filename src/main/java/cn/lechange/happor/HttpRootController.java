@@ -11,7 +11,13 @@ import io.netty.handler.codec.http.FullHttpResponse;
 import io.netty.handler.codec.http.HttpResponseStatus;
 
 public class HttpRootController extends ChannelInboundHandlerAdapter {
-
+	
+	private HapporWebserver server;
+	
+	public HttpRootController(HapporWebserver server) {
+		this.server = server;
+	}
+	
 	@Override
 	public void channelRead(ChannelHandlerContext ctx, Object msg)
 			throws Exception {
@@ -23,7 +29,7 @@ public class HttpRootController extends ChannelInboundHandlerAdapter {
 			
 			HttpController lastController = null;
 			
-			Map<String, HttpController> controllers = HapporHelper.getControllers();
+			Map<String, HttpController> controllers = server.getContext().getControllers();
 			for (Map.Entry<String, HttpController> entry : controllers.entrySet()) {
 				String name = entry.getKey();
 				HttpController hc = entry.getValue();
@@ -32,7 +38,7 @@ public class HttpRootController extends ChannelInboundHandlerAdapter {
 				
 				if ((method == null || request.getMethod().name().equals(method))
 						&& request.getUri().matches(uriPattern)) {
-					HttpController controller = HapporHelper.getController(name);
+					HttpController controller = server.getContext().getController(name);
 					controller.setPrev(lastController);
 					boolean isEnd = controller.input(ctx, request, response);
 					if (isEnd) {

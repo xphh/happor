@@ -3,23 +3,22 @@ package cn.lechange.happor;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
+import org.springframework.beans.factory.NoSuchBeanDefinitionException;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.FileSystemXmlApplicationContext;
 
 import cn.lechange.happor.controller.HttpController;
 
-public class HapporHelper {
+public class HapporContext {
 
-	private static Logger logger = Logger.getLogger(HapporHelper.class);
+	private static Logger logger = Logger.getLogger(HapporContext.class);
 
 	private static FileSystemXmlApplicationContext ctx;
 
 	private static Map<String, HttpController> controllers;
 
-	public static void runServer(String filename) {
+	public HapporContext(String filename) {
 		ctx = new FileSystemXmlApplicationContext(filename);
-
-		HapporWebserver server = ctx.getBean(HapporWebserver.class);
 
 		controllers = ctx.getBeansOfType(HttpController.class);
 		for (Map.Entry<String, HttpController> entry : controllers.entrySet()) {
@@ -27,22 +26,37 @@ public class HapporHelper {
 					+ entry.getValue().getMethod() + " "
 					+ entry.getValue().getUriPattern() + "]");
 		}
-
-		server.startup();
-
+	}
+	
+	public void close() {
 		ctx.close();
 	}
-
-	public static ApplicationContext getContext() {
+	
+	public void runServer() {
+		HapporWebserver server = ctx.getBean(HapporWebserver.class);
+		server.startup(this);
+	}
+	
+	public ApplicationContext getContext() {
 		return ctx;
 	}
 
-	public static Map<String, HttpController> getControllers() {
+	public Map<String, HttpController> getControllers() {
 		return controllers;
 	}
 
-	public static HttpController getController(String name) {
+	public HttpController getController(String name) {
 		return (HttpController) ctx.getBean(name);
+	}
+	
+	public WebserverHandler getWebserverHandler() {
+		WebserverHandler handler = null;
+		try {
+			handler = (WebserverHandler) ctx.getBean(WebserverHandler.class);
+		} catch (NoSuchBeanDefinitionException e) {
+			logger.info("has no WebserverHandler");
+		}
+		return handler;
 	}
 
 }

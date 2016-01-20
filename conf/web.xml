@@ -24,6 +24,9 @@
 		<property name="timeout" value="30" />
 		<property name="maxHttpSize" value="20000000" />
 	</bean>
+	
+	<!-- define your handler -->
+	<bean id="testWebserverHandler" class="cn.lechange.happor.TestWebserverHandler" />
 
 	<!-- define your controllers below -->
 	<bean id="testIncomingFilter" class="cn.lechange.happor.TestIncomingFilter"
