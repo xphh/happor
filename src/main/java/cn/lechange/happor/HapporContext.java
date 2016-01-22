@@ -13,9 +13,11 @@ public class HapporContext {
 
 	private static Logger logger = Logger.getLogger(HapporContext.class);
 
-	private static FileSystemXmlApplicationContext ctx;
+	private FileSystemXmlApplicationContext ctx;
 
-	private static Map<String, HttpController> controllers;
+	private Map<String, HttpController> controllers;
+	
+	private WebserverHandler webserverHandler;
 
 	public HapporContext(String filename) {
 		ctx = new FileSystemXmlApplicationContext(filename);
@@ -25,6 +27,12 @@ public class HapporContext {
 			logger.info("add controller: " + entry.getKey() + "["
 					+ entry.getValue().getMethod() + " "
 					+ entry.getValue().getUriPattern() + "]");
+		}
+		
+		try {
+			webserverHandler = (WebserverHandler) ctx.getBean(WebserverHandler.class);
+		} catch (NoSuchBeanDefinitionException e) {
+			logger.info("has no WebserverHandler");
 		}
 	}
 	
@@ -50,13 +58,7 @@ public class HapporContext {
 	}
 	
 	public WebserverHandler getWebserverHandler() {
-		WebserverHandler handler = null;
-		try {
-			handler = (WebserverHandler) ctx.getBean(WebserverHandler.class);
-		} catch (NoSuchBeanDefinitionException e) {
-			logger.info("has no WebserverHandler");
-		}
-		return handler;
+		return webserverHandler;
 	}
 
 }
