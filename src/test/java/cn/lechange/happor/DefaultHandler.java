@@ -5,7 +5,7 @@ import io.netty.handler.codec.http.FullHttpRequest;
 import io.netty.handler.codec.http.FullHttpResponse;
 import io.netty.handler.codec.http.HttpResponseStatus;
 
-public class DefaultlHandler extends HttpNormalHandler {
+public class DefaultHandler extends HttpNormalHandler {
 
 	@Override
 	protected void handle(FullHttpRequest request, FullHttpResponse response) {

@@ -29,6 +29,7 @@
 	<bean class="cn.lechange.happor.TestNormalHandler" scope="prototype">
 		<property name="method" value="GET" />
 		<property name="uriPattern" value="^/test" />
+		<property name="test" value="1" />
 	</bean>
 
 	<bean class="cn.lechange.happor.TestAsyncHandler" scope="prototype">
@@ -40,7 +41,7 @@
 		<property name="uriPattern" value="^/trans" />
 	</bean>
 
-	<bean class="cn.lechange.happor.DefaultlHandler" scope="prototype">
+	<bean class="cn.lechange.happor.DefaultHandler" scope="prototype">
 		<property name="uriPattern" value=".*" />
 	</bean>
 
