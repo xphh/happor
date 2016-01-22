@@ -11,48 +11,36 @@
 
 	<context:annotation-config />
 
-	<bean id="server" class="cn.lechange.happor.HapporWebserver">
-		<property name="port" value="8080" />
-	</bean>
-
-	<bean id="channelInitializer" class="cn.lechange.happor.HapporChannelInitializer">
+	<bean class="cn.lechange.happor.HapporWebserver">
+		<property name="port" value="9080" />
 		<property name="executeThreads" value="50" />
 		<property name="maxHttpSize" value="20000000" />
+		<property name="timeout" value="30" />
 	</bean>
 
-	<bean id="asyncHttpClient" class="cn.lechange.happor.utils.AsyncHttpClient">
-		<property name="timeout" value="30" />
-		<property name="maxHttpSize" value="20000000" />
-	</bean>
-	
 	<!-- define your handler -->
-	<bean id="testWebserverHandler" class="cn.lechange.happor.TestWebserverHandler" />
+	<bean class="cn.lechange.happor.TestWebserverHandler" />
 
 	<!-- define your controllers below -->
-	<bean id="testIncomingFilter" class="cn.lechange.happor.TestIncomingFilter"
-		scope="prototype">
+	<bean class="cn.lechange.happor.TestIncomingFilter" scope="prototype">
 		<property name="uriPattern" value=".*" />
 	</bean>
 
-	<bean id="testNormalHandler" class="cn.lechange.happor.TestNormalHandler"
-		scope="prototype">
+	<bean class="cn.lechange.happor.TestNormalHandler" scope="prototype">
 		<property name="method" value="GET" />
 		<property name="uriPattern" value="^/test" />
 	</bean>
 
-	<bean id="testAsyncHandler" class="cn.lechange.happor.TestAsyncHandler"
-		scope="prototype">
+	<bean class="cn.lechange.happor.TestAsyncHandler" scope="prototype">
 		<property name="method" value="GET" />
 		<property name="uriPattern" value="^/async" />
 	</bean>
 
-	<bean id="testTransitHandler" class="cn.lechange.happor.TestTransitHandler"
-		scope="prototype">
+	<bean class="cn.lechange.happor.TestTransitHandler" scope="prototype">
 		<property name="uriPattern" value="^/trans" />
 	</bean>
 
-	<bean id="defaultlHandler" class="cn.lechange.happor.DefaultlHandler"
-		scope="prototype">
+	<bean class="cn.lechange.happor.DefaultlHandler" scope="prototype">
 		<property name="uriPattern" value=".*" />
 	</bean>
 

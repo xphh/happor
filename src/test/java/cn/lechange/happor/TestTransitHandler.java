@@ -11,7 +11,7 @@ public class TestTransitHandler extends HttpTransitHandler {
 		// TODO Auto-generated method stub
 		request.setUri("/test");
 		request.headers().add("x-incoming", "1");
-		transit("127.0.0.1", 8080);
+		transit("127.0.0.1", 9080);
 	}
 
 	@Override

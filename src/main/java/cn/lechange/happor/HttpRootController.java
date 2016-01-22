@@ -40,6 +40,7 @@ public class HttpRootController extends ChannelInboundHandlerAdapter {
 						&& request.getUri().matches(uriPattern)) {
 					HttpController controller = server.getContext().getController(name);
 					controller.setPrev(lastController);
+					controller.setServer(server);
 					boolean isEnd = controller.input(ctx, request, response);
 					if (isEnd) {
 						break;

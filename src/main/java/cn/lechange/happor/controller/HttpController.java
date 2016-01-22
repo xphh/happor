@@ -2,6 +2,8 @@ package cn.lechange.happor.controller;
 
 import org.apache.log4j.Logger;
 
+import cn.lechange.happor.HapporWebserver;
+
 import io.netty.channel.ChannelFutureListener;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.http.FullHttpRequest;
@@ -50,6 +52,14 @@ public abstract class HttpController {
 	private HttpController prev;
 	final public void setPrev(HttpController controller) {
 		prev = controller;
+	}
+	
+	private HapporWebserver server;
+	public void setServer(HapporWebserver server) {
+		this.server = server;
+	}
+	public HapporWebserver getServer() {
+		return server;
 	}
 	
 	private void realFinish(FullHttpResponse response) {

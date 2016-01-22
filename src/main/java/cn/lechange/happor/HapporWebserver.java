@@ -8,44 +8,72 @@ import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
 import io.netty.handler.logging.LogLevel;
 import io.netty.handler.logging.LoggingHandler;
-
 import org.apache.log4j.Logger;
-import org.springframework.beans.factory.annotation.Autowired;
+
+import cn.lechange.happor.utils.AsyncHttpClient;
 
 public class HapporWebserver {
 
 	private static Logger logger = Logger.getLogger(HapporWebserver.class);
 
-	private int port;
+	private int port = 80;
+	private int executeThreads = 0;
+	private int maxHttpSize = 1000000;
+	private int timeout = 3;
 
 	public int getPort() {
 		return port;
 	}
-
 	public void setPort(int port) {
 		this.port = port;
 	}
-	
-	@Autowired
-	private HapporChannelInitializer channelInitializer;
+	public int getExecuteThreads() {
+		return executeThreads;
+	}
+	public void setExecuteThreads(int executeThreads) {
+		this.executeThreads = executeThreads;
+	}
+	public int getMaxHttpSize() {
+		return maxHttpSize;
+	}
+	public void setMaxHttpSize(int maxHttpSize) {
+		this.maxHttpSize = maxHttpSize;
+	}
+	public int getTimeout() {
+		return timeout;
+	}
+	public void setTimeout(int timeout) {
+		this.timeout = timeout;
+	}
 	
 	private HapporContext ctx;
 	
 	public HapporContext getContext() {
 		return ctx;
 	}
+	
+	private AsyncHttpClient asyncHttpClient;
+
+	public AsyncHttpClient getAsyncHttpClient() {
+		if (asyncHttpClient == null) {
+			asyncHttpClient = new AsyncHttpClient();
+			asyncHttpClient.setMaxHttpSize(maxHttpSize);
+			asyncHttpClient.setTimeout(timeout);
+		}
+		return asyncHttpClient;
+	}
 
 	public void startup(HapporContext ctx) {
 		this.ctx = ctx;
 		
 		EventLoopGroup bossGroup = new NioEventLoopGroup(1);
-		EventLoopGroup workerGroup = new NioEventLoopGroup();
+		EventLoopGroup workerGroup = new NioEventLoopGroup(executeThreads);
 		try {
 			ServerBootstrap b = new ServerBootstrap();
 			b.group(bossGroup, workerGroup)
 					.channel(NioServerSocketChannel.class)
 					.handler(new LoggingHandler(LogLevel.INFO))
-					.childHandler(channelInitializer)
+					.childHandler(new HapporChannelInitializer(this))
 					.option(ChannelOption.SO_BACKLOG, 1024)
 					.option(ChannelOption.SO_REUSEADDR, true)
 					.childOption(ChannelOption.SO_KEEPALIVE, true)

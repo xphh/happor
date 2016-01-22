@@ -14,9 +14,7 @@ public class HapporContext {
 	private static Logger logger = Logger.getLogger(HapporContext.class);
 
 	private FileSystemXmlApplicationContext ctx;
-
 	private Map<String, HttpController> controllers;
-	
 	private WebserverHandler webserverHandler;
 
 	public HapporContext(String filename) {
