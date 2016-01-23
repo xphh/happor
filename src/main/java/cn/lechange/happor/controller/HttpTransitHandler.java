@@ -27,14 +27,14 @@ public abstract class HttpTransitHandler extends HttpAsyncHandler {
 			public void onConnectFail() {
 				// TODO Auto-generated method stub
 				transResponse = new DefaultFullHttpResponse(
-						transRequest.getProtocolVersion(), new HttpResponseStatus(491, "Transit Connect Fail"));
+						transRequest.getProtocolVersion(), new HttpResponseStatus(591, "Transit Connect Fail"));
 				finish(transResponse);
 			}
 			
 			public void onTimeout() {
 				// TODO Auto-generated method stub
 				transResponse = new DefaultFullHttpResponse(
-						transRequest.getProtocolVersion(), new HttpResponseStatus(492, "Transit Timeout"));
+						transRequest.getProtocolVersion(), new HttpResponseStatus(592, "Transit Timeout"));
 				finish(transResponse);
 			}
 			
