@@ -1,10 +1,10 @@
 package cn.lechange.happor;
 
 import java.util.Map;
-
 import org.apache.log4j.Logger;
 
 import cn.lechange.happor.controller.HttpController;
+import cn.lechange.happor.utils.UriParser;
 import io.netty.channel.ChannelFutureListener;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
@@ -44,12 +44,14 @@ public class HttpRootController extends ChannelInboundHandlerAdapter {
 				HttpController hc = entry.getValue();
 				String method = hc.getMethod();
 				String uriPattern = hc.getUriPattern();
+				UriParser uriParser = new UriParser(request.getUri());
 				
-				if ((method == null || request.getMethod().name().equals(method))
-						&& request.getUri().matches(uriPattern)) {
+				if ((method == null || method.isEmpty() || request.getMethod().name().equals(method))
+						&& uriParser.matches(uriPattern)) {
 					HttpController controller = server.getContext().getController(name);
 					controller.setPrev(lastController);
 					controller.setServer(server);
+					controller.setUriParser(uriParser);
 					boolean isEnd = controller.input(ctx, request, response);
 					if (isEnd) {
 						break;

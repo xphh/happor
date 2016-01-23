@@ -9,7 +9,7 @@ public class TestTransitHandler extends HttpTransitHandler {
 	@Override
 	protected void incoming(FullHttpRequest request) {
 		// TODO Auto-generated method stub
-		request.setUri("/test");
+		request.setUri("/test/fromtrans");
 		request.headers().add("x-incoming", "1");
 		transit("127.0.0.1", 9080);
 	}

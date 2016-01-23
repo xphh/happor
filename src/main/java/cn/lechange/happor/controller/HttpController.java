@@ -3,6 +3,7 @@ package cn.lechange.happor.controller;
 import org.apache.log4j.Logger;
 
 import cn.lechange.happor.HapporWebserver;
+import cn.lechange.happor.utils.UriParser;
 
 import io.netty.channel.ChannelFutureListener;
 import io.netty.channel.ChannelHandlerContext;
@@ -14,7 +15,8 @@ public abstract class HttpController {
 	private static Logger logger = Logger.getLogger(HttpController.class);
 
 	private String method;
-	private String uriPattern;
+	private String uriPattern = ".*";
+	private UriParser uriParser;
 
 	public String getMethod() {
 		return method;
@@ -32,6 +34,14 @@ public abstract class HttpController {
 		this.uriPattern = uriPattern;
 	}
 	
+	public UriParser getUriParser() {
+		return uriParser;
+	}
+
+	public void setUriParser(UriParser uriParser) {
+		this.uriParser = uriParser;
+	}
+
 	private ChannelHandlerContext ctx;
 	private FullHttpRequest request;
 	

@@ -6,18 +6,10 @@ import io.netty.handler.codec.http.FullHttpResponse;
 
 public class TestNormalHandler extends HttpNormalHandler {
 	
-	private int test;
-	public int getTest() {
-		return test;
-	}
-	public void setTest(int test) {
-		this.test = test;
-	}
-
 	@Override
 	protected void handle(FullHttpRequest request, FullHttpResponse response) {
 		// TODO Auto-generated method stub
-		String words = String.format("hello world ( test = %d )", test);
+		String words = "hello world " + getUriParser().getSection(1);
 		response.content().writeBytes(words.getBytes());
 		response.headers().set("Content-Type", "text/plain");
 		response.headers().set("Content-Length", response.content().readableBytes());
