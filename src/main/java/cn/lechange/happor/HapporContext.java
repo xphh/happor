@@ -3,7 +3,11 @@ package cn.lechange.happor;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.apache.log4j.BasicConfigurator;
+import org.apache.log4j.Level;
+import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
+import org.apache.log4j.helpers.NullEnumeration;
 import org.springframework.beans.factory.NoSuchBeanDefinitionException;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.FileSystemXmlApplicationContext;
@@ -18,6 +22,13 @@ public class HapporContext {
 	private HapporWebserver server;
 	private Map<String, HttpController> controllers;
 	private WebserverHandler webserverHandler;
+	
+	static {
+		if (LogManager.getRootLogger().getAllAppenders() instanceof NullEnumeration) {
+			BasicConfigurator.configure();
+			LogManager.getRootLogger().setLevel(Level.INFO);
+		}
+	}
 
 	public HapporContext() {
 		this(null);

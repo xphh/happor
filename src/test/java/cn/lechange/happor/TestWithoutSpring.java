@@ -1,7 +1,5 @@
 package cn.lechange.happor;
 
-import org.apache.log4j.PropertyConfigurator;
-
 public class TestWithoutSpring {
 
 	/**
@@ -9,8 +7,6 @@ public class TestWithoutSpring {
 	 */
 	public static void main(String[] args) {
 		// TODO Auto-generated method stub
-		PropertyConfigurator.configure("conf/log4j.properties");
-
 		HapporContext context = new HapporContext();
 		context.getServer().setPort(9080);
 		context.getServer().setExecuteThreads(16);
