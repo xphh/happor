@@ -1,5 +1,7 @@
 package cn.lechange.happor;
 
+import cn.lechange.happor.context.HapporManualContext;
+
 public class TestWithoutSpring {
 
 	/**
@@ -7,7 +9,7 @@ public class TestWithoutSpring {
 	 */
 	public static void main(String[] args) {
 		// TODO Auto-generated method stub
-		HapporContext context = new HapporContext();
+		HapporContext context = new HapporManualContext();
 		context.getServer().setPort(9080);
 		context.getServer().setExecuteThreads(16);
 		context.getServer().setMaxHttpSize(1000000);
