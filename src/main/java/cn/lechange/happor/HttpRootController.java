@@ -37,6 +37,7 @@ public class HttpRootController extends ChannelInboundHandlerAdapter {
 					request.getProtocolVersion(), HttpResponseStatus.OK);
 			
 			HttpController lastController = null;
+			UriParser uriParser = new UriParser(request.getUri());
 			
 			Map<String, HttpController> controllers = server.getContext().getControllers();
 			for (Map.Entry<String, HttpController> entry : controllers.entrySet()) {
@@ -44,7 +45,6 @@ public class HttpRootController extends ChannelInboundHandlerAdapter {
 				HttpController hc = entry.getValue();
 				String method = hc.getMethod();
 				String uriPattern = hc.getUriPattern();
-				UriParser uriParser = new UriParser(request.getUri());
 				
 				if ((method == null || method.isEmpty() || request.getMethod().name().equals(method))
 						&& uriParser.matches(uriPattern)) {
