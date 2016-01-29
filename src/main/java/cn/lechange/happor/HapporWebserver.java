@@ -66,6 +66,12 @@ public class HapporWebserver {
 	public void startup(HapporContext ctx) {
 		this.ctx = ctx;
 		
+		logger.info("HttpServer is starting...");
+		logger.info("port = " + port);
+		logger.info("timeout = " + timeout);
+		logger.info("maxHttpSize = " + maxHttpSize);
+		logger.info("executeThreads = " + executeThreads);
+		
 		EventLoopGroup bossGroup = new NioEventLoopGroup(1);
 		EventLoopGroup workerGroup = new NioEventLoopGroup(executeThreads);
 		try {
@@ -81,7 +87,7 @@ public class HapporWebserver {
 
 			// Bind and start to accept incoming connections.
 			ChannelFuture f = b.bind(port).sync(); // (7)
-			logger.info("HttpServer start @port[" + port + "] OK!");
+			logger.info("HttpServer start OK!");
 			
 			WebserverHandler handler = ctx.getWebserverHandler();
 			if (handler != null) {

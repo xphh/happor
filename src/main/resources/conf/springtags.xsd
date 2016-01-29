@@ -22,6 +22,7 @@
 					<xsd:attribute name="timeout" type="xsd:int" use="optional" default="30" />
 					<xsd:attribute name="maxHttpSize" type="xsd:int" use="optional" default="1000000" />
 					<xsd:attribute name="executeThreads" type="xsd:int" use="optional" default="0" />
+					<xsd:attribute name="propFile" type="xsd:string" use="optional" default="" />
 				</xsd:extension>
 			</xsd:complexContent>
 		</xsd:complexType>

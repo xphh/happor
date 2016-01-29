@@ -1,9 +1,12 @@
 package cn.lechange.happor.springtags;
 
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Properties;
 
-import org.apache.log4j.Logger;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.config.BeanDefinitionHolder;
 import org.springframework.beans.factory.support.AbstractBeanDefinition;
@@ -19,9 +22,6 @@ import cn.lechange.happor.utils.PackageUtil;
 
 public class TagHapporServerParser extends AbstractSimpleBeanDefinitionParser {
 
-	private static Logger logger = Logger
-			.getLogger(TagHapporServerParser.class);
-	
 	private ParserContext parserContext;
 	private List<String> clazzList = new ArrayList<String>();
 	
@@ -36,16 +36,43 @@ public class TagHapporServerParser extends AbstractSimpleBeanDefinitionParser {
 			BeanDefinitionBuilder builder) {
 		this.parserContext = parserContext;
 		
-		int port = Integer.valueOf(element.getAttribute("port"));
-		int timeout = Integer.valueOf(element.getAttribute("timeout"));
-		int maxHttpSize = Integer.valueOf(element.getAttribute("maxHttpSize"));
-		int executeThreads = Integer.valueOf(element
-				.getAttribute("executeThreads"));
-
-		builder.addPropertyValue("port", port);
-		builder.addPropertyValue("timeout", timeout);
-		builder.addPropertyValue("maxHttpSize", maxHttpSize);
-		builder.addPropertyValue("executeThreads", executeThreads);
+		String port = element.getAttribute("port");
+		String timeout = element.getAttribute("timeout");
+		String maxHttpSize = element.getAttribute("maxHttpSize");
+		String executeThreads = element.getAttribute("executeThreads");
+		String propFile = element.getAttribute("propFile");
+		
+		if (!propFile.isEmpty()) {
+			FileInputStream in = null;
+			try {
+				in = new FileInputStream(propFile);
+				Properties prop = new Properties();
+				prop.load(in);
+				port = prop.getProperty("happor.server.port", port);
+				timeout = prop.getProperty("happor.server.timeout", timeout);
+				maxHttpSize = prop.getProperty("happor.server.maxHttpSize", maxHttpSize);
+				executeThreads = prop.getProperty("happor.server.executeThreads", executeThreads);
+			} catch (FileNotFoundException e) {
+				e.printStackTrace();
+				System.exit(-1);
+			} catch (IOException e) {
+				e.printStackTrace();
+				System.exit(-1);
+			} finally {
+				if (in != null) {
+					try {
+						in.close();
+					} catch (IOException e) {
+						
+					}
+				}
+			}
+		}
+		
+		builder.addPropertyValue("port", Integer.valueOf(port));
+		builder.addPropertyValue("timeout", Integer.valueOf(timeout));
+		builder.addPropertyValue("maxHttpSize", Integer.valueOf(maxHttpSize));
+		builder.addPropertyValue("executeThreads", Integer.valueOf(executeThreads));
 
 		Element handler = DomUtils.getChildElementByTagName(element, "handler");
 		if (handler != null) {
@@ -94,7 +121,8 @@ public class TagHapporServerParser extends AbstractSimpleBeanDefinitionParser {
 					beanDefinitionBuilder.getBeanDefinition(), name, null);
 			registerBeanDefinition(holder, parserContext.getRegistry());
 		} catch (ClassNotFoundException e) {
-			logger.error(e.getMessage());
+			e.printStackTrace();
+			System.exit(-1);
 		}
 	}
 	
@@ -116,7 +144,8 @@ public class TagHapporServerParser extends AbstractSimpleBeanDefinitionParser {
 			registerBeanDefinition(holder, parserContext.getRegistry());
 			clazzList.add(clazz);
 		} catch (ClassNotFoundException e) {
-			logger.error(e.getMessage());
+			e.printStackTrace();
+			System.exit(-1);
 		}
 	}
 	
@@ -134,7 +163,8 @@ public class TagHapporServerParser extends AbstractSimpleBeanDefinitionParser {
 					controllerList.add(clazz);
 				}
 			} catch (ClassNotFoundException e) {
-				logger.error(e.getMessage());
+				e.printStackTrace();
+				System.exit(-1);
 			}
 		}
 		return controllerList;
