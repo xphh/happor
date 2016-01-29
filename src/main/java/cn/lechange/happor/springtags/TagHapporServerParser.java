@@ -104,10 +104,10 @@ public class TagHapporServerParser extends AbstractSimpleBeanDefinitionParser {
 			BeanDefinitionBuilder beanDefinitionBuilder = BeanDefinitionBuilder
 					.rootBeanDefinition(Class.forName(clazz));
 			BeanDefinition beanDefinition = beanDefinitionBuilder.getBeanDefinition();
-			if (method != null) {
+			if (!(method == null || method.isEmpty())) {
 				beanDefinition.getPropertyValues().addPropertyValue("method", method);
 			}
-			if (uriPattern != null) {
+			if (!(uriPattern == null || uriPattern.isEmpty())) {
 				beanDefinition.getPropertyValues().addPropertyValue("uriPattern", uriPattern);
 			}
 			beanDefinition.setScope("prototype");
