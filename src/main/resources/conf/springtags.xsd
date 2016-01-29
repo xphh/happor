@@ -49,6 +49,7 @@
 				<xsd:extension base="beans:identifiedType">
 					<xsd:sequence>
 						<xsd:element ref="controller" minOccurs="0" maxOccurs="unbounded" />
+						<xsd:element ref="auto-search" minOccurs="0" maxOccurs="1" />
 					</xsd:sequence>
 					<xsd:attribute name="package" type="xsd:string" use="optional" default="" />
 				</xsd:extension>
@@ -66,6 +67,19 @@
 					<xsd:attribute name="method" type="xsd:string" use="optional" default="" />
 					<xsd:attribute name="uriptn" type="xsd:string" use="optional" default="" />
 					<xsd:attribute name="class" type="xsd:string" use="required" />
+				</xsd:extension>
+			</xsd:complexContent>
+		</xsd:complexType>
+	</xsd:element>
+	
+	<xsd:element name="auto-search">
+		<xsd:annotation>
+			<xsd:documentation>auto search controllers from specific package</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexType>
+			<xsd:complexContent>
+				<xsd:extension base="beans:identifiedType">
+					<xsd:attribute name="defaultClass" type="xsd:string" use="required" />
 				</xsd:extension>
 			</xsd:complexContent>
 		</xsd:complexType>
