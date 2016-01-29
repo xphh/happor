@@ -11,5 +11,5 @@ import java.lang.annotation.Target;
 @Documented
 public @interface Controller {
 	public String method() default "";
-	public String uriPattern() default ".*";
+	public String uriPattern() default "";
 }

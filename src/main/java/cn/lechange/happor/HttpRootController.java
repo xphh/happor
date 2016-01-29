@@ -46,8 +46,7 @@ public class HttpRootController extends ChannelInboundHandlerAdapter {
 				String uriPattern = hc.getUriPattern();
 				UriParser uriParser = new UriParser(request.getUri());
 				
-				if ((method == null || method.isEmpty() || request.getMethod().name().equals(method))
-						&& uriParser.matches(uriPattern)) {
+				if (isMethodMatch(method) && isUriMatch(uriParser, uriPattern)) {
 					HttpController controller = server.getContext().getController(name);
 					controller.setPrev(lastController);
 					controller.setServer(server);
@@ -77,5 +76,24 @@ public class HttpRootController extends ChannelInboundHandlerAdapter {
 			}
 		}
 	}
+	
+	private boolean isMethodMatch(String method) {
+		if (method == null || method.isEmpty()) {
+			return true;
+		} else if (request.getMethod().name().equals(method)) {
+			return true;
+		} else {
+			return false;
+		}
+	}
 
+	private boolean isUriMatch(UriParser uri, String pattern) {
+		if (pattern == null || pattern.isEmpty()) {
+			return true;
+		} else if (uri.matches(pattern)) {
+			return true;
+		} else {
+			return false;
+		}
+	}
 }

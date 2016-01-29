@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xsd:schema xmlns="http://happor.lechange.cn/schema/tags"
+	targetNamespace="http://happor.lechange.cn/schema/tags"
+	xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+	xmlns:beans="http://www.springframework.org/schema/beans"
+	elementFormDefault="qualified" attributeFormDefault="unqualified">
+	
+	<xsd:import namespace="http://www.springframework.org/schema/beans" />
+	
+	<xsd:element name="server">
+		<xsd:annotation>
+			<xsd:documentation>webserver configuration</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexType>
+			<xsd:complexContent>
+				<xsd:extension base="beans:identifiedType">
+					<xsd:sequence>
+						<xsd:element ref="handler" minOccurs="0" maxOccurs="1" />
+						<xsd:element ref="controllers" minOccurs="0" maxOccurs="1" />
+					</xsd:sequence>
+					<xsd:attribute name="port" type="xsd:int" use="optional" default="80" />
+					<xsd:attribute name="timeout" type="xsd:int" use="optional" default="30" />
+					<xsd:attribute name="maxHttpSize" type="xsd:int" use="optional" default="1000000" />
+					<xsd:attribute name="executeThreads" type="xsd:int" use="optional" default="0" />
+				</xsd:extension>
+			</xsd:complexContent>
+		</xsd:complexType>
+	</xsd:element>
+	
+	<xsd:element name="handler">
+		<xsd:annotation>
+			<xsd:documentation>webserver handler</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexType>
+			<xsd:complexContent>
+				<xsd:extension base="beans:identifiedType">
+					<xsd:attribute name="class" type="xsd:string" use="required" />
+				</xsd:extension>
+			</xsd:complexContent>
+		</xsd:complexType>
+	</xsd:element>
+	
+	<xsd:element name="controllers">
+		<xsd:annotation>
+			<xsd:documentation>webserver controller list</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexType>
+			<xsd:complexContent>
+				<xsd:extension base="beans:identifiedType">
+					<xsd:sequence>
+						<xsd:element ref="controller" minOccurs="0" maxOccurs="unbounded" />
+					</xsd:sequence>
+					<xsd:attribute name="package" type="xsd:string" use="optional" default="" />
+				</xsd:extension>
+			</xsd:complexContent>
+		</xsd:complexType>
+	</xsd:element>
+	
+	<xsd:element name="controller">
+		<xsd:annotation>
+			<xsd:documentation>webserver controller</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexType>
+			<xsd:complexContent>
+				<xsd:extension base="beans:identifiedType">
+					<xsd:attribute name="method" type="xsd:string" use="optional" default="" />
+					<xsd:attribute name="uriptn" type="xsd:string" use="optional" default="" />
+					<xsd:attribute name="class" type="xsd:string" use="required" />
+				</xsd:extension>
+			</xsd:complexContent>
+		</xsd:complexType>
+	</xsd:element>
+	
+</xsd:schema>

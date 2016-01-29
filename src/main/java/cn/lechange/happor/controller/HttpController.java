@@ -20,7 +20,7 @@ public abstract class HttpController {
 	private static Logger logger = Logger.getLogger(HttpController.class);
 
 	private String method;
-	private String uriPattern = ".*";
+	private String uriPattern;
 	private UriParser uriParser;
 
 	public String getMethod() {
