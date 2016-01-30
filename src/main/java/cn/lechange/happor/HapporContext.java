@@ -95,6 +95,10 @@ public abstract class HapporContext {
 			controllers.put(name, registry);
 		}
 	}
+	
+	public void scanControllers() {
+		scanControllers("");
+	}
 
 	public abstract HttpController getController(Class<? extends HttpController> clazz);
 	
@@ -103,7 +107,6 @@ public abstract class HapporContext {
 		List<ControllerRegistry> controllerList = new ArrayList<ControllerRegistry>();
 		String defaultClassName = null;
 		for (String className : list) {
-			className = className.substring(className.indexOf(packageName));
 			try {
 				Class<?> clazz = Class.forName(className);
 				if (HttpController.class.isAssignableFrom(clazz)) {

@@ -1,4 +1,4 @@
-package cn.lechange.happor;
+package cn.lechange.happor.controllers;
 
 import io.netty.handler.codec.http.FullHttpRequest;
 import io.netty.handler.codec.http.FullHttpResponse;

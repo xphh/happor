@@ -1,6 +1,11 @@
 package cn.lechange.happor;
 
 import cn.lechange.happor.context.HapporManualContext;
+import cn.lechange.happor.controllers.DefaultHandler;
+import cn.lechange.happor.controllers.TestAsyncHandler;
+import cn.lechange.happor.controllers.TestIncomingFilter;
+import cn.lechange.happor.controllers.TestNormalHandler;
+import cn.lechange.happor.controllers.TestTransitHandler;
 
 public class TestWithoutSpring {
 

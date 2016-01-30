@@ -7,7 +7,7 @@ import cn.lechange.happor.annotation.UriSection;
 import cn.lechange.happor.context.HapporManualContext;
 import cn.lechange.happor.controller.HttpNormalHandler;
 
-@Controller(method="GET", uriPattern="/test/(\\w+)")
+@Controller(method="GET", uriPattern="^/test/(\\w+)")
 public class TestAnnotation extends HttpNormalHandler {
 	
 	@UriSection(1)
@@ -31,7 +31,7 @@ public class TestAnnotation extends HttpNormalHandler {
 	public static void main(String[] args) {
 		// TODO Auto-generated method stub
 		HapporContext context = new HapporManualContext();
-		context.scanControllers("cn.lechange.happor");
+		context.scanControllers();
 		context.getServer().setPort(9080);
 		context.runServer();
 	}

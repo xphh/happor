@@ -1,6 +1,7 @@
 package cn.lechange.happor.utils;
 
 import java.io.File;
+import java.io.IOException;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.ArrayList;
@@ -10,7 +11,14 @@ import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 
 public class PackageUtil {
-
+	
+	public static void main(String[] args) {
+		List<String> list = getClassName("");
+		for (String className : list) {
+			System.out.println(className);
+		}
+	}
+	
 	/**
 	 * 获取某包下（包括该包的所有子包）所有类
 	 * @param packageName 包名
@@ -26,22 +34,23 @@ public class PackageUtil {
 	 * @param childPackage 是否遍历子包
 	 * @return 类的完整名称
 	 */
-	public static List<String> getClassName(String packageName, boolean childPackage) {
-		List<String> fileNames = null;
+	public static List<String> getClassName(String packageName, boolean recur) {
+		List<String> classNames = null;
 		ClassLoader loader = Thread.currentThread().getContextClassLoader();
 		String packagePath = packageName.replace(".", "/");
 		URL url = loader.getResource(packagePath);
 		if (url != null) {
 			String type = url.getProtocol();
 			if (type.equals("file")) {
-				fileNames = getClassNameByFile(url.getPath(), null, childPackage);
+				String classPath = loader.getResource("").getPath();
+				classNames = getClassNameByFile(classPath, url.getPath(), recur);
 			} else if (type.equals("jar")) {
-				fileNames = getClassNameByJar(url.getPath(), childPackage);
+				classNames = getClassNameByJar(url.getPath(), recur);
 			}
 		} else {
-			fileNames = getClassNameByJars(((URLClassLoader) loader).getURLs(), packagePath, childPackage);
+			classNames = getClassNameByJars(((URLClassLoader) loader).getURLs(), packagePath, recur);
 		}
-		return fileNames;
+		return classNames;
 	}
 
 	/**
@@ -51,26 +60,26 @@ public class PackageUtil {
 	 * @param childPackage 是否遍历子包
 	 * @return 类的完整名称
 	 */
-	private static List<String> getClassNameByFile(String filePath, List<String> className, boolean childPackage) {
-		List<String> myClassName = new ArrayList<String>();
+	private static List<String> getClassNameByFile(String classPath, String filePath, boolean recur) {
+		List<String> classNames = new ArrayList<String>();
 		File file = new File(filePath);
 		File[] childFiles = file.listFiles();
 		for (File childFile : childFiles) {
 			if (childFile.isDirectory()) {
-				if (childPackage) {
-					myClassName.addAll(getClassNameByFile(childFile.getPath(), myClassName, childPackage));
+				if (recur) {
+					classNames.addAll(getClassNameByFile(classPath, childFile.getPath(), recur));
 				}
 			} else {
-				String childFilePath = childFile.getPath();
+				String childFilePath = childFile.toURI().getPath();
 				if (childFilePath.endsWith(".class")) {
-					childFilePath = childFilePath.substring(childFilePath.indexOf("\\classes") + 9, childFilePath.lastIndexOf("."));
-					childFilePath = childFilePath.replace("\\", ".");
-					myClassName.add(childFilePath);
+					childFilePath = childFilePath.substring(classPath.length(), childFilePath.lastIndexOf("."));
+					childFilePath = childFilePath.replace("/", ".");
+					classNames.add(childFilePath);
 				}
 			}
 		}
 
-		return myClassName;
+		return classNames;
 	}
 
 	/**
@@ -79,19 +88,20 @@ public class PackageUtil {
 	 * @param childPackage 是否遍历子包
 	 * @return 类的完整名称
 	 */
-	private static List<String> getClassNameByJar(String jarPath, boolean childPackage) {
+	private static List<String> getClassNameByJar(String jarPath, boolean recur) {
 		List<String> myClassName = new ArrayList<String>();
 		String[] jarInfo = jarPath.split("!");
 		String jarFilePath = jarInfo[0].substring(jarInfo[0].indexOf("/"));
 		String packagePath = jarInfo[1].substring(1);
+		JarFile jarFile = null;
 		try {
-			JarFile jarFile = new JarFile(jarFilePath);
+			jarFile = new JarFile(jarFilePath);
 			Enumeration<JarEntry> entrys = jarFile.entries();
 			while (entrys.hasMoreElements()) {
 				JarEntry jarEntry = entrys.nextElement();
 				String entryName = jarEntry.getName();
 				if (entryName.endsWith(".class")) {
-					if (childPackage) {
+					if (recur) {
 						if (entryName.startsWith(packagePath)) {
 							entryName = entryName.replace("/", ".").substring(0, entryName.lastIndexOf("."));
 							myClassName.add(entryName);
@@ -111,8 +121,16 @@ public class PackageUtil {
 					}
 				}
 			}
-		} catch (Exception e) {
+		} catch (IOException e) {
 			e.printStackTrace();
+		} finally {
+			if (jarFile != null) {
+				try {
+					jarFile.close();
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+			}
 		}
 		return myClassName;
 	}
@@ -124,7 +142,7 @@ public class PackageUtil {
 	 * @param childPackage 是否遍历子包
 	 * @return 类的完整名称
 	 */
-	private static List<String> getClassNameByJars(URL[] urls, String packagePath, boolean childPackage) {
+	private static List<String> getClassNameByJars(URL[] urls, String packagePath, boolean recur) {
 		List<String> myClassName = new ArrayList<String>();
 		if (urls != null) {
 			for (int i = 0; i < urls.length; i++) {
@@ -135,7 +153,7 @@ public class PackageUtil {
 					continue;
 				}
 				String jarPath = urlPath + "!/" + packagePath;
-				myClassName.addAll(getClassNameByJar(jarPath, childPackage));
+				myClassName.addAll(getClassNameByJar(jarPath, recur));
 			}
 		}
 		return myClassName;
