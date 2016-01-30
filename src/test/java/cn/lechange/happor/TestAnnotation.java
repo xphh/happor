@@ -31,7 +31,7 @@ public class TestAnnotation extends HttpNormalHandler {
 	public static void main(String[] args) {
 		// TODO Auto-generated method stub
 		HapporContext context = new HapporManualContext();
-		context.addController(new TestAnnotation());
+		context.scanControllers("cn.lechange.happor");
 		context.getServer().setPort(9080);
 		context.runServer();
 	}

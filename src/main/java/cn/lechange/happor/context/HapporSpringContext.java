@@ -5,6 +5,7 @@ import org.springframework.beans.factory.NoSuchBeanDefinitionException;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.FileSystemXmlApplicationContext;
 
+import cn.lechange.happor.ControllerRegistry;
 import cn.lechange.happor.HapporContext;
 import cn.lechange.happor.HapporWebserver;
 import cn.lechange.happor.WebserverHandler;
@@ -19,7 +20,7 @@ public class HapporSpringContext extends HapporContext {
 	public HapporSpringContext(String filename) {
 		ctx = new FileSystemXmlApplicationContext(filename);
 		setServer(ctx.getBean(HapporWebserver.class));
-		setControllers(ctx.getBeansOfType(HttpController.class));
+		setControllers(ctx.getBeansOfType(ControllerRegistry.class));
 		try {
 			setWebserverHandler(ctx.getBean(WebserverHandler.class));
 		} catch (NoSuchBeanDefinitionException e) {
@@ -38,9 +39,9 @@ public class HapporSpringContext extends HapporContext {
 	}
 
 	@Override
-	public HttpController getController(String name) {
+	public HttpController getController(Class<? extends HttpController> clazz) {
 		// TODO Auto-generated method stub
-		return (HttpController) ctx.getBean(name);
+		return (HttpController) ctx.getBean(clazz);
 	}
 
 }

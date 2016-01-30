@@ -16,9 +16,9 @@ import org.springframework.beans.factory.xml.ParserContext;
 import org.springframework.util.xml.DomUtils;
 import org.w3c.dom.Element;
 
+import cn.lechange.happor.ControllerRegistry;
+import cn.lechange.happor.HapporContext;
 import cn.lechange.happor.HapporWebserver;
-import cn.lechange.happor.controller.HttpController;
-import cn.lechange.happor.utils.PackageUtil;
 
 public class TagHapporServerParser extends AbstractSimpleBeanDefinitionParser {
 
@@ -88,21 +88,14 @@ public class TagHapporServerParser extends AbstractSimpleBeanDefinitionParser {
 				String clazz = packageName + "." + controller.getAttribute("class");
 				String method = controller.getAttribute("method");
 				String uriptn = controller.getAttribute("uriptn");
-				addController(clazz, method, uriptn);
+				addRegistry(clazz, method, uriptn);
 			}
-			Element autoSearch = DomUtils.getChildElementByTagName(controllers, "auto-search");
-			if (autoSearch != null) {
-				String defaultClazz = packageName + "." + autoSearch.getAttribute("defaultClass");
-				List<String> autoList = getControllersFromPackage(packageName);
-				for (String clazz : autoList) {
-					if (clazzList.contains(clazz)) {
-						continue;
-					} else if (defaultClazz.equals(clazz)) {
-						continue;
-					}
-					addController(clazz);
+			Element autoScan = DomUtils.getChildElementByTagName(controllers, "auto-scan");
+			if (autoScan != null) {
+				List<ControllerRegistry> autoList = HapporContext.getControllersFromPackage(packageName);
+				for (ControllerRegistry registry : autoList) {
+					addRegistry(registry.getClassName(), registry.getMethod(), registry.getUriPattern());
 				}
-				addController(defaultClazz);
 			}
 		}
 
@@ -126,18 +119,26 @@ public class TagHapporServerParser extends AbstractSimpleBeanDefinitionParser {
 		}
 	}
 	
-	private void addController(String clazz, String method, String uriPattern) {
+	private void addRegistry(String clazz, String method, String uriPattern) {
 		String name = "controller#" + clazzList.size() + "_" + clazz;
+		BeanDefinitionBuilder beanDefinitionBuilder = BeanDefinitionBuilder
+				.rootBeanDefinition(ControllerRegistry.class);
+		BeanDefinition beanDefinition = beanDefinitionBuilder.getBeanDefinition();
+		beanDefinition.getPropertyValues().addPropertyValue("className", clazz);
+		beanDefinition.getPropertyValues().addPropertyValue("method", method);
+		beanDefinition.getPropertyValues().addPropertyValue("uriPattern", uriPattern);
+		BeanDefinitionHolder holder = new BeanDefinitionHolder(
+				beanDefinition, name, null);
+		registerBeanDefinition(holder, parserContext.getRegistry());
+		addController(clazz);
+	}
+	
+	private void addController(String clazz) {
+		String name = "controllerEntity#" + clazzList.size() + "_" + clazz;
 		try {
 			BeanDefinitionBuilder beanDefinitionBuilder = BeanDefinitionBuilder
 					.rootBeanDefinition(Class.forName(clazz));
 			BeanDefinition beanDefinition = beanDefinitionBuilder.getBeanDefinition();
-			if (!(method == null || method.isEmpty())) {
-				beanDefinition.getPropertyValues().addPropertyValue("method", method);
-			}
-			if (!(uriPattern == null || uriPattern.isEmpty())) {
-				beanDefinition.getPropertyValues().addPropertyValue("uriPattern", uriPattern);
-			}
 			beanDefinition.setScope("prototype");
 			BeanDefinitionHolder holder = new BeanDefinitionHolder(
 					beanDefinition, name, null);
@@ -149,25 +150,4 @@ public class TagHapporServerParser extends AbstractSimpleBeanDefinitionParser {
 		}
 	}
 	
-	private void addController(String clazz) {
-		addController(clazz, null, null);
-	}
-	
-	private List<String> getControllersFromPackage(String packageName) {
-		List<String> list = PackageUtil.getClassName(packageName);
-		List<String> controllerList = new ArrayList<String>();
-		for (String clazz : list) {
-			clazz = clazz.substring(clazz.indexOf(packageName));
-			try {
-				if (HttpController.class.isAssignableFrom(Class.forName(clazz))) {
-					controllerList.add(clazz);
-				}
-			} catch (ClassNotFoundException e) {
-				e.printStackTrace();
-				System.exit(-1);
-			}
-		}
-		return controllerList;
-	}
-
 }

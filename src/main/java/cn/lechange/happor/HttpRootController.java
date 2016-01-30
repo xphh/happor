@@ -38,16 +38,15 @@ public class HttpRootController extends ChannelInboundHandlerAdapter {
 			
 			HttpController lastController = null;
 			
-			Map<String, HttpController> controllers = server.getContext().getControllers();
-			for (Map.Entry<String, HttpController> entry : controllers.entrySet()) {
-				String name = entry.getKey();
-				HttpController hc = entry.getValue();
-				String method = hc.getMethod();
-				String uriPattern = hc.getUriPattern();
+			Map<String, ControllerRegistry> controllers = server.getContext().getControllers();
+			for (Map.Entry<String, ControllerRegistry> entry : controllers.entrySet()) {
+				ControllerRegistry registry = entry.getValue();
+				String method = registry.getMethod();
+				String uriPattern = registry.getUriPattern();
 				UriParser uriParser = new UriParser(request.getUri());
 				
 				if (isMethodMatch(method) && isUriMatch(uriParser, uriPattern)) {
-					HttpController controller = server.getContext().getController(name);
+					HttpController controller = server.getContext().getController(registry.getClazz());
 					controller.setPrev(lastController);
 					controller.setServer(server);
 					controller.setUriParser(uriParser);

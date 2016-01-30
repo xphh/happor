@@ -5,7 +5,6 @@ import java.lang.reflect.Field;
 import org.apache.log4j.Logger;
 
 import cn.lechange.happor.HapporWebserver;
-import cn.lechange.happor.annotation.Controller;
 import cn.lechange.happor.annotation.UriParam;
 import cn.lechange.happor.annotation.UriSection;
 import cn.lechange.happor.utils.UriParser;
@@ -19,26 +18,8 @@ public abstract class HttpController {
 
 	private static Logger logger = Logger.getLogger(HttpController.class);
 
-	private String method;
-	private String uriPattern;
 	private UriParser uriParser;
 
-	public String getMethod() {
-		return method;
-	}
-
-	public void setMethod(String method) {
-		this.method = method;
-	}
-
-	public String getUriPattern() {
-		return uriPattern;
-	}
-
-	public void setUriPattern(String uriPattern) {
-		this.uriPattern = uriPattern;
-	}
-	
 	public UriParser getUriParser() {
 		return uriParser;
 	}
@@ -49,10 +30,6 @@ public abstract class HttpController {
 
 	private ChannelHandlerContext ctx;
 	private FullHttpRequest request;
-	
-	public HttpController() {
-		parseClassAnnotation();
-	}
 	
 	final public boolean input(ChannelHandlerContext ctx, FullHttpRequest request,
 			FullHttpResponse response) {
@@ -107,14 +84,6 @@ public abstract class HttpController {
 			FullHttpResponse response);
 	protected abstract void handleResponse(FullHttpResponse response);
 	
-	private void parseClassAnnotation() {
-		if (getClass().isAnnotationPresent(Controller.class)) {
-			Controller anno = getClass().getAnnotation(Controller.class);
-			setMethod(anno.method());
-			setUriPattern(anno.uriPattern());
-		}
-	}
-
 	private void parseFieldAnnotation() {
 		Field[] fields = getClass().getDeclaredFields();
 		for (Field field : fields) {

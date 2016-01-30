@@ -1,10 +1,12 @@
 package cn.lechange.happor;
 
+import cn.lechange.happor.annotation.DefaultController;
 import cn.lechange.happor.controller.HttpNormalHandler;
 import io.netty.handler.codec.http.FullHttpRequest;
 import io.netty.handler.codec.http.FullHttpResponse;
 import io.netty.handler.codec.http.HttpResponseStatus;
 
+@DefaultController
 public class DefaultHandler extends HttpNormalHandler {
 
 	@Override

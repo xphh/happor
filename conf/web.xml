@@ -20,7 +20,7 @@
 			<happor:controller class="TestNormalHandler" method="GET" uriptn="^/test/(\w+)" />
 			<happor:controller class="TestAsyncHandler" method="GET" uriptn="^/async" />
 			<happor:controller class="TestTransitHandler" uriptn="^/trans" />
-			<happor:auto-search defaultClass="DefaultHandler" />
+			<happor:auto-scan />
 		</happor:controllers>
 	</happor:server>
 
