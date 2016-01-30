@@ -17,7 +17,7 @@ import org.springframework.util.xml.DomUtils;
 import org.w3c.dom.Element;
 
 import cn.lechange.happor.ControllerRegistry;
-import cn.lechange.happor.HapporContext;
+import cn.lechange.happor.ControllerScanner;
 import cn.lechange.happor.HapporWebserver;
 
 public class TagHapporServerParser extends AbstractSimpleBeanDefinitionParser {
@@ -86,19 +86,40 @@ public class TagHapporServerParser extends AbstractSimpleBeanDefinitionParser {
 			List<Element> list = DomUtils.getChildElementsByTagName(controllers, "controller");
 			for (Element controller : list) {
 				String clazz = packageName + "." + controller.getAttribute("class");
-				String method = controller.getAttribute("method");
-				String uriptn = controller.getAttribute("uriptn");
-				addRegistry(clazz, method, uriptn);
-			}
-			Element autoScan = DomUtils.getChildElementByTagName(controllers, "auto-scan");
-			if (autoScan != null) {
-				List<ControllerRegistry> autoList = HapporContext.getControllersFromPackage(packageName);
-				for (ControllerRegistry registry : autoList) {
-					addRegistry(registry.getClassName(), registry.getMethod(), registry.getUriPattern());
+				if (clazzList.contains(clazz)) {
+					System.err.println("duplicate controller '" + clazz + "'");
+					System.exit(-1);
+				} else {
+					String method = controller.getAttribute("method");
+					String uriptn = controller.getAttribute("uriptn");
+					addRegistry(clazz, method, uriptn);
 				}
 			}
 		}
 
+		Element autoScan = DomUtils.getChildElementByTagName(element, "controllers-auto-scan");
+		if (autoScan != null) {
+			String packageName = autoScan.getAttribute("package");
+			ControllerScanner controllerScanner = new ControllerScanner();
+			controllerScanner.scan(packageName);
+			List<Element> list = DomUtils.getChildElementsByTagName(autoScan, "filter");
+			for (Element filter : list) {
+				String name = filter.getAttribute("name");
+				ControllerRegistry r = controllerScanner.getFilter(name);
+				if (r == null) {
+					System.err.println("no filter named '" + name + "'");
+					System.exit(-1);
+				} else if (clazzList.contains(r.getClassName())) {
+					System.err.println("duplicate filter '" + name + "'");
+					System.exit(-1);
+				} else {
+					addRegistry(r.getClassName(), r.getMethod(), r.getUriPattern());
+				}
+			}
+			for (ControllerRegistry r : controllerScanner.getHandlers()) {
+				addRegistry(r.getClassName(), r.getMethod(), r.getUriPattern());
+			}
+		}
 	}
 
 	@Override
@@ -120,7 +141,7 @@ public class TagHapporServerParser extends AbstractSimpleBeanDefinitionParser {
 	}
 	
 	private void addRegistry(String clazz, String method, String uriPattern) {
-		String name = "controller#" + clazzList.size() + "_" + clazz;
+		String name = "controllerRegistry#" + clazzList.size();
 		BeanDefinitionBuilder beanDefinitionBuilder = BeanDefinitionBuilder
 				.rootBeanDefinition(ControllerRegistry.class);
 		BeanDefinition beanDefinition = beanDefinitionBuilder.getBeanDefinition();
@@ -134,7 +155,7 @@ public class TagHapporServerParser extends AbstractSimpleBeanDefinitionParser {
 	}
 	
 	private void addController(String clazz) {
-		String name = "controllerEntity#" + clazzList.size() + "_" + clazz;
+		String name = "controller#" + clazzList.size();
 		try {
 			BeanDefinitionBuilder beanDefinitionBuilder = BeanDefinitionBuilder
 					.rootBeanDefinition(Class.forName(clazz));

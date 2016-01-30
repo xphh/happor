@@ -17,6 +17,7 @@
 					<xsd:sequence>
 						<xsd:element ref="handler" minOccurs="0" maxOccurs="1" />
 						<xsd:element ref="controllers" minOccurs="0" maxOccurs="1" />
+						<xsd:element ref="controllers-auto-scan" minOccurs="0" maxOccurs="1" />
 					</xsd:sequence>
 					<xsd:attribute name="port" type="xsd:int" use="optional" default="80" />
 					<xsd:attribute name="timeout" type="xsd:int" use="optional" default="30" />
@@ -50,7 +51,6 @@
 				<xsd:extension base="beans:identifiedType">
 					<xsd:sequence>
 						<xsd:element ref="controller" minOccurs="0" maxOccurs="unbounded" />
-						<xsd:element ref="auto-scan" minOccurs="0" maxOccurs="1" />
 					</xsd:sequence>
 					<xsd:attribute name="package" type="xsd:string" use="optional" default="" />
 				</xsd:extension>
@@ -73,13 +73,30 @@
 		</xsd:complexType>
 	</xsd:element>
 	
-	<xsd:element name="auto-scan">
+	<xsd:element name="controllers-auto-scan">
 		<xsd:annotation>
 			<xsd:documentation>auto scan controllers from specific package</xsd:documentation>
 		</xsd:annotation>
 		<xsd:complexType>
 			<xsd:complexContent>
 				<xsd:extension base="beans:identifiedType">
+					<xsd:sequence>
+						<xsd:element ref="filter" minOccurs="0" maxOccurs="unbounded" />
+					</xsd:sequence>
+					<xsd:attribute name="package" type="xsd:string" use="optional" default="" />
+				</xsd:extension>
+			</xsd:complexContent>
+		</xsd:complexType>
+	</xsd:element>
+	
+	<xsd:element name="filter">
+		<xsd:annotation>
+			<xsd:documentation>webserver controller</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexType>
+			<xsd:complexContent>
+				<xsd:extension base="beans:identifiedType">
+					<xsd:attribute name="name" type="xsd:string" use="required" />
 				</xsd:extension>
 			</xsd:complexContent>
 		</xsd:complexType>

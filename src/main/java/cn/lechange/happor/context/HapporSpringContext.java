@@ -1,5 +1,7 @@
 package cn.lechange.happor.context;
 
+import java.util.Map;
+
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.NoSuchBeanDefinitionException;
 import org.springframework.context.ApplicationContext;
@@ -19,8 +21,14 @@ public class HapporSpringContext extends HapporContext {
 
 	public HapporSpringContext(String filename) {
 		ctx = new FileSystemXmlApplicationContext(filename);
+		
 		setServer(ctx.getBean(HapporWebserver.class));
-		setControllers(ctx.getBeansOfType(ControllerRegistry.class));
+		
+		Map<String, ControllerRegistry> controllers = ctx.getBeansOfType(ControllerRegistry.class);
+		for (Map.Entry<String, ControllerRegistry> entry : controllers.entrySet()) {
+			addController(entry.getValue());
+		}
+		
 		try {
 			setWebserverHandler(ctx.getBean(WebserverHandler.class));
 		} catch (NoSuchBeanDefinitionException e) {

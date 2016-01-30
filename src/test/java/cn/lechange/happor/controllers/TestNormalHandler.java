@@ -1,9 +1,11 @@
 package cn.lechange.happor.controllers;
 
+import cn.lechange.happor.annotation.Controller;
 import cn.lechange.happor.controller.HttpNormalHandler;
 import io.netty.handler.codec.http.FullHttpRequest;
 import io.netty.handler.codec.http.FullHttpResponse;
 
+@Controller(method="GET", uriPattern="^/test/(\\w+)")
 public class TestNormalHandler extends HttpNormalHandler {
 	
 	@Override

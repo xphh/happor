@@ -1,10 +1,7 @@
 package cn.lechange.happor.context;
 
-import java.util.LinkedHashMap;
-
 import org.apache.log4j.Logger;
 
-import cn.lechange.happor.ControllerRegistry;
 import cn.lechange.happor.HapporContext;
 import cn.lechange.happor.HapporWebserver;
 import cn.lechange.happor.controller.HttpController;
@@ -15,7 +12,6 @@ public class HapporManualContext extends HapporContext {
 
 	public HapporManualContext() {
 		setServer(new HapporWebserver());
-		setControllers(new LinkedHashMap<String, ControllerRegistry>());
 	}
 
 	@Override

@@ -4,10 +4,10 @@ import io.netty.handler.codec.http.FullHttpRequest;
 import io.netty.handler.codec.http.FullHttpResponse;
 import cn.lechange.happor.annotation.Controller;
 import cn.lechange.happor.annotation.UriSection;
-import cn.lechange.happor.context.HapporManualContext;
+import cn.lechange.happor.context.HapporAutomaticContext;
 import cn.lechange.happor.controller.HttpNormalHandler;
 
-@Controller(method="GET", uriPattern="^/test/(\\w+)")
+@Controller(method="GET", uriPattern="^/anno/(\\w+)")
 public class TestAnnotation extends HttpNormalHandler {
 	
 	@UriSection(1)
@@ -30,8 +30,8 @@ public class TestAnnotation extends HttpNormalHandler {
 
 	public static void main(String[] args) {
 		// TODO Auto-generated method stub
-		HapporContext context = new HapporManualContext();
-		context.scanControllers();
+		HapporAutomaticContext context = new HapporAutomaticContext();
+		context.addFilters(new String[] {"incoming"});
 		context.getServer().setPort(9080);
 		context.runServer();
 	}

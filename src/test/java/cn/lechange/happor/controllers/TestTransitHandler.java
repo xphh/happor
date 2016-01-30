@@ -2,8 +2,10 @@ package cn.lechange.happor.controllers;
 
 import io.netty.handler.codec.http.FullHttpRequest;
 import io.netty.handler.codec.http.FullHttpResponse;
+import cn.lechange.happor.annotation.Controller;
 import cn.lechange.happor.controller.HttpTransitHandler;
 
+@Controller(method="GET", uriPattern="^/trans")
 public class TestTransitHandler extends HttpTransitHandler {
 
 	@Override

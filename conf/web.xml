@@ -15,13 +15,21 @@
 	<!-- happor webserver -->
 	<happor:server port="9080" timeout="30" maxHttpSize="1000000" executeThreads="32">
 		<happor:handler class="cn.lechange.happor.TestWebserverHandler" />
-		<happor:controllers package="cn.lechange.happor">
+		<!-- basiclly you can use happor:controllers -->
+		<!--
+		<happor:controllers package="cn.lechange.happor.controllers">
 			<happor:controller class="TestIncomingFilter" />
 			<happor:controller class="TestNormalHandler" method="GET" uriptn="^/test/(\w+)" />
 			<happor:controller class="TestAsyncHandler" method="GET" uriptn="^/async" />
 			<happor:controller class="TestTransitHandler" uriptn="^/trans" />
-			<happor:auto-scan />
+			<happor:controller class="DefaultHandler" />
 		</happor:controllers>
+		-->
+		<!-- or you can use happor:controllers-auto-scan for more convenience
+		     NOTICE: must set the annotation on the controller classes! -->
+		<happor:controllers-auto-scan package="cn.lechange.happor">
+		    <happor:filter name="incoming" />
+		</happor:controllers-auto-scan>
 	</happor:server>
 
 	<!-- other beans here -->
