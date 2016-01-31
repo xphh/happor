@@ -7,11 +7,6 @@ However, SpringMVC is based on Servlet and, it's hard to dettach Servlet from Sp
 
 Things can be simplification. By using Spring IoC to make a controller framework based on Netty without Servlet, I setup this project.
 
-# usage
-Setup beans(webserver, controllers) in web.xml, and write codes to run server in Test.java. This project is easy to understand.
-
-目录docs下有中文文档。
-
 #A hello-world demo
 ```Java
 @Controller(method="GET", uriPattern="^/test/(\\w+)")
