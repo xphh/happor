@@ -11,3 +11,37 @@ Things can be simplification. By using Spring IoC to make a controller framework
 Setup beans(webserver, controllers) in web.xml, and write codes to run server in Test.java. This project is easy to understand.
 
 目录docs下有中文文档。
+
+#A hello-world demo
+```Java
+@Controller(method="GET", uriPattern="^/test/(\\w+)")
+public class Test extends HttpNormalHandler {
+	
+	@UriSection(1)
+	private String name;
+
+	@Override
+	protected void handle(FullHttpRequest request, FullHttpResponse response) {
+		// TODO Auto-generated method stub
+		String words = "hello " + name;
+		response.content().writeBytes(words.getBytes());
+		response.headers().set("Content-Type", "text/plain");
+		response.headers().set("Content-Length", response.content().readableBytes());
+	}
+
+	@Override
+	protected void atlast() {
+		// TODO Auto-generated method stub
+		
+	}
+
+	public static void main(String[] args) {
+		// TODO Auto-generated method stub
+		HapporAutomaticContext context = new HapporAutomaticContext();
+		context.runServer();
+	}
+
+}
+```
+
+Run and visit `http://localhost/test/someone`, the browser will show `hello someone`.
