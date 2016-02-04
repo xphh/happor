@@ -4,7 +4,7 @@
 
 	<groupId>cn.lechange</groupId>
 	<artifactId>happor</artifactId>
-	<version>0.4.1-Trunk</version>
+	<version>0.4.2-Trunk</version>
 	<packaging>jar</packaging>
 
 	<name>happor</name>

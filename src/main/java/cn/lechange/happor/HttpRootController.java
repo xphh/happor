@@ -36,9 +36,17 @@ public class HttpRootController extends ChannelInboundHandlerAdapter {
 			response = new DefaultFullHttpResponse(
 					request.getProtocolVersion(), HttpResponseStatus.OK);
 			
+			HapporContext happorContext = server.getContext(request);
+			if (happorContext == null) {
+				logger.error("cannot find path for URI: " + request.getUri());
+				response.setStatus(HttpResponseStatus.INTERNAL_SERVER_ERROR);
+				ctx.channel().writeAndFlush(response).addListener(ChannelFutureListener.CLOSE);
+				return;
+			}
+			
 			HttpController lastController = null;
 			
-			Map<String, ControllerRegistry> controllers = server.getContext().getControllers();
+			Map<String, ControllerRegistry> controllers = happorContext.getControllers();
 			for (Map.Entry<String, ControllerRegistry> entry : controllers.entrySet()) {
 				ControllerRegistry registry = entry.getValue();
 				String method = registry.getMethod();
@@ -46,7 +54,7 @@ public class HttpRootController extends ChannelInboundHandlerAdapter {
 				UriParser uriParser = new UriParser(request.getUri());
 				
 				if (isMethodMatch(method) && isUriMatch(uriParser, uriPattern)) {
-					HttpController controller = server.getContext().getController(registry.getClazz());
+					HttpController controller = happorContext.getController(registry.getClazz());
 					controller.setPrev(lastController);
 					controller.setServer(server);
 					controller.setUriParser(uriParser);

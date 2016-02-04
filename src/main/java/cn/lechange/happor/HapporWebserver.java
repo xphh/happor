@@ -1,13 +1,17 @@
 package cn.lechange.happor;
 
+import java.util.Map;
+
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelOption;
 import io.netty.channel.EventLoopGroup;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
+import io.netty.handler.codec.http.HttpRequest;
 import io.netty.handler.logging.LogLevel;
 import io.netty.handler.logging.LoggingHandler;
+
 import org.apache.log4j.Logger;
 
 import cn.lechange.happor.utils.AsyncHttpClient;
@@ -46,10 +50,27 @@ public class HapporWebserver {
 		this.timeout = timeout;
 	}
 	
-	private HapporContext ctx;
+	private Map<String, HapporContext> pathContexts;
+	private HapporContext context;
 	
-	public HapporContext getContext() {
-		return ctx;
+	public void setPathContexts(Map<String, HapporContext> pathContexts) {
+		this.pathContexts = pathContexts;
+	}
+	
+	public HapporContext getContext(HttpRequest request) {
+		if (pathContexts != null) {
+			String uri = request.getUri();
+			for (Map.Entry<String, HapporContext> entry : pathContexts.entrySet()) {
+				String path = entry.getKey();
+				HapporContext ctx = entry.getValue();
+				if (uri.startsWith("/" + path + "/")) {
+					logger.info("enter path: " + path);
+					request.setUri(uri.substring(1 + path.length()));
+					return ctx;
+				}
+			}
+		}
+		return context;
 	}
 	
 	private AsyncHttpClient asyncHttpClient;
@@ -64,7 +85,7 @@ public class HapporWebserver {
 	}
 
 	public void startup(HapporContext ctx) {
-		this.ctx = ctx;
+		context = ctx;
 		
 		logger.info("HttpServer is starting...");
 		logger.info("port = " + port);
@@ -89,9 +110,9 @@ public class HapporWebserver {
 			ChannelFuture f = b.bind(port).sync(); // (7)
 			logger.info("HttpServer start OK!");
 			
-			WebserverHandler handler = ctx.getWebserverHandler();
+			WebserverHandler handler = context.getWebserverHandler();
 			if (handler != null) {
-				handler.onInit();
+				handler.onInit(this);
 			}
 
 			// Wait until the server socket is closed.
