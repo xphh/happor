@@ -25,18 +25,28 @@ public class PackageUtil {
 	 * @return 类的完整名称
 	 */
 	public static List<String> getClassName(String packageName) {
-		return getClassName(packageName, true);
+		return getClassName(Thread.currentThread().getContextClassLoader(), packageName, true);
+	}
+
+	/**
+	 * 获取某包下（包括该包的所有子包）所有类
+	 * @param ClassLoader ClassLoader
+	 * @param packageName 包名
+	 * @return 类的完整名称
+	 */
+	public static List<String> getClassName(ClassLoader loader, String packageName) {
+		return getClassName(loader, packageName, true);
 	}
 
 	/**
 	 * 获取某包下所有类
+	 * @param ClassLoader ClassLoader
 	 * @param packageName 包名
 	 * @param childPackage 是否遍历子包
 	 * @return 类的完整名称
 	 */
-	public static List<String> getClassName(String packageName, boolean recur) {
+	public static List<String> getClassName(ClassLoader loader, String packageName, boolean recur) {
 		List<String> classNames = null;
-		ClassLoader loader = Thread.currentThread().getContextClassLoader();
 		String packagePath = packageName.replace(".", "/");
 		URL url = loader.getResource(packagePath);
 		if (url != null) {
