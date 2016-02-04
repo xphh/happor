@@ -26,14 +26,19 @@ public abstract class HapporContext {
 			LogManager.getRootLogger().setLevel(Level.INFO);
 		}
 	}
-
-	public void runServer() {
+	
+	public void printInfo() {
+		logger.info("HapporContext = " + this);
 		for (Map.Entry<String, ControllerRegistry> entry : controllers
 				.entrySet()) {
 			logger.info(entry.getKey() + "[" + entry.getValue().getMethod()
 					+ " " + entry.getValue().getUriPattern() + "]");
 		}
 		logger.info("webserverHandler = " + webserverHandler);
+	}
+
+	public void runServer() {
+		printInfo();
 		server.startup(this);
 	}
 

@@ -3,6 +3,8 @@ package cn.lechange.happor.context;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.apache.log4j.Logger;
+
 import cn.lechange.happor.ControllerRegistry;
 import cn.lechange.happor.HapporContext;
 import cn.lechange.happor.HapporWebserver;
@@ -11,6 +13,8 @@ import cn.lechange.happor.controller.HttpController;
 
 public class HapporMultipleContext extends HapporContext {
 	
+	private static Logger logger = Logger.getLogger(HapporMultipleContext.class);
+
 	private HapporWebserver server;
 	private HapporContext defaultContext;
 	private Map<String, HapporContext> pathContexts = new HashMap<String, HapporContext>();
@@ -58,6 +62,19 @@ public class HapporMultipleContext extends HapporContext {
 		pathContexts.clear();
 	}
 	
+	@Override
+	public void printInfo() {
+		logger.info("This is a multiple context: " + this);
+		if (defaultContext != null) {
+			logger.info("=> default");
+			defaultContext.printInfo();
+		}
+		for (Map.Entry<String, HapporContext> entry : pathContexts.entrySet()) {
+			logger.info("=> path: " + entry.getKey());
+			entry.getValue().printInfo();
+		}
+	}
+
 	@Override
 	public Map<String, ControllerRegistry> getControllers() {
 		if (defaultContext == null) {
