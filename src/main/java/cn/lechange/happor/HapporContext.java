@@ -68,7 +68,7 @@ public abstract class HapporContext {
 			String method, String uriPattern) {
 		String name = "controller#" + controllers.size() + "_" + clazz.getName();
 		ControllerRegistry registry = new ControllerRegistry();
-		registry.setClassName(clazz.getName());
+		registry.setClazz(clazz);
 		registry.setMethod(method);
 		registry.setUriPattern(uriPattern);
 		controllers.put(name, registry);

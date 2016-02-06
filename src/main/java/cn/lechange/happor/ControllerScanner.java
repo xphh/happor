@@ -30,18 +30,23 @@ public class ControllerScanner {
 
 	private List<ControllerRegistry> handlers = new ArrayList<ControllerRegistry>();
 	private Map<String, ControllerRegistry> filters = new HashMap<String, ControllerRegistry>();
-	private String defaultHandlers;
+	private Class<? extends HttpController> defaultClazz;
 
 	public void scan(String packageName) {
-		List<String> list = PackageUtil.getClassName(packageName);
+		scan(Thread.currentThread().getContextClassLoader(), packageName);
+	}
+	
+	@SuppressWarnings("unchecked")
+	public void scan(ClassLoader classLoader, String packageName) {
+		List<String> list = PackageUtil.getClassName(classLoader, packageName);
 		for (String className : list) {
 			try {
-				Class<?> clazz = Class.forName(className);
+				Class<?> clazz = classLoader.loadClass(className);
 				if (HttpController.class.isAssignableFrom(clazz)) {
 					if (clazz.isAnnotationPresent(Controller.class)) {
 						Controller anno = clazz.getAnnotation(Controller.class);
 						ControllerRegistry registry = new ControllerRegistry();
-						registry.setClassName(className);
+						registry.setClazz((Class<? extends HttpController>) clazz);
 						registry.setMethod(anno.method());
 						registry.setUriPattern(anno.uriPattern());
 						if (clazz.isAnnotationPresent(Filter.class)) {
@@ -51,16 +56,16 @@ public class ControllerScanner {
 							handlers.add(registry);
 						}
 					} else if (clazz.isAnnotationPresent(DefaultController.class)) {
-						defaultHandlers = className;
+						defaultClazz = (Class<? extends HttpController>) clazz;
 					}
 				}
 			} catch (ClassNotFoundException e) {
 				logger.error(e);
 			}
 		}
-		if (defaultHandlers != null) {
+		if (defaultClazz != null) {
 			ControllerRegistry registry = new ControllerRegistry();
-			registry.setClassName(defaultHandlers);
+			registry.setClazz(defaultClazz);
 			handlers.add(registry);
 		}
 	}

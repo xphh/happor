@@ -1,18 +1,16 @@
 package cn.lechange.happor;
 
+import cn.lechange.happor.container.JarImporter.JarStub;
 import cn.lechange.happor.context.HapporSpringContext;
-import cn.lechange.happor.context.HapporJarContainerContext.JarStub;
 
 public class TestJarStub implements JarStub {
 
-	public HapporContext getContext() {
+	public HapporContext init(ClassLoader classLoader) {
 		// TODO Auto-generated method stub
-		return new HapporSpringContext("conf/web.xml");
-	}
-
-	public String getPath() {
-		// TODO Auto-generated method stub
-		return null;
+//		HapporContext ctx = new HapporAutomaticContext(classLoader, "!");
+//		ctx.setWebserverHandler(new TestWebserverHandler());
+		HapporContext ctx = new HapporSpringContext(classLoader, "conf/web.xml");
+		return ctx;
 	}
 
 }

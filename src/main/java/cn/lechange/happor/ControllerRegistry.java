@@ -29,14 +29,13 @@ public class ControllerRegistry {
 		return className;
 	}
 
-	@SuppressWarnings("unchecked")
 	public void setClassName(String className) {
 		this.className = className;
-		try {
-			clazz = (Class<? extends HttpController>) Class.forName(className);
-		} catch (ClassNotFoundException e) {
-			e.printStackTrace();
-		}
+	}
+	
+	public void setClazz(Class<? extends HttpController> clazz) {
+		this.clazz = clazz;
+		this.className = clazz.getName();
 	}
 
 	public Class<? extends HttpController> getClazz() {

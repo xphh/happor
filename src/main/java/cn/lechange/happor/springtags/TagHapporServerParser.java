@@ -7,8 +7,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
 
-import org.springframework.beans.factory.config.BeanDefinition;
-import org.springframework.beans.factory.config.BeanDefinitionHolder;
 import org.springframework.beans.factory.support.AbstractBeanDefinition;
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
 import org.springframework.beans.factory.xml.AbstractSimpleBeanDefinitionParser;
@@ -17,14 +15,10 @@ import org.springframework.util.xml.DomUtils;
 import org.w3c.dom.Element;
 
 import cn.lechange.happor.ControllerRegistry;
-import cn.lechange.happor.ControllerScanner;
 import cn.lechange.happor.HapporWebserver;
 
 public class TagHapporServerParser extends AbstractSimpleBeanDefinitionParser {
 
-	private ParserContext parserContext;
-	private List<String> clazzList = new ArrayList<String>();
-	
 	@Override
 	protected String resolveId(Element element,
 			AbstractBeanDefinition beanDefinition, ParserContext parserContext) {
@@ -34,8 +28,6 @@ public class TagHapporServerParser extends AbstractSimpleBeanDefinitionParser {
 	@Override
 	protected void doParse(Element element, ParserContext parserContext,
 			BeanDefinitionBuilder builder) {
-		this.parserContext = parserContext;
-		
 		String port = element.getAttribute("port");
 		String timeout = element.getAttribute("timeout");
 		String maxHttpSize = element.getAttribute("maxHttpSize");
@@ -69,106 +61,54 @@ public class TagHapporServerParser extends AbstractSimpleBeanDefinitionParser {
 			}
 		}
 		
-		builder.addPropertyValue("port", Integer.valueOf(port));
-		builder.addPropertyValue("timeout", Integer.valueOf(timeout));
-		builder.addPropertyValue("maxHttpSize", Integer.valueOf(maxHttpSize));
-		builder.addPropertyValue("executeThreads", Integer.valueOf(executeThreads));
+		HapporWebserver server = new HapporWebserver();
+		server.setPort(Integer.valueOf(port));
+		server.setTimeout(Integer.valueOf(timeout));
+		server.setMaxHttpSize(Integer.valueOf(maxHttpSize));
+		server.setExecuteThreads(Integer.valueOf(executeThreads));
+		builder.addPropertyValue("server", server);
 
 		Element handler = DomUtils.getChildElementByTagName(element, "handler");
 		if (handler != null) {
-			String clazz = handler.getAttribute("class");
-			addBean("handler", clazz);
+			String handlerClass = handler.getAttribute("class");
+			builder.addPropertyValue("handlerClass", handlerClass);
 		}
 
-		Element controllers = DomUtils.getChildElementByTagName(element, "controllers");
-		if (controllers != null) {
-			String packageName = controllers.getAttribute("package");
-			List<Element> list = DomUtils.getChildElementsByTagName(controllers, "controller");
+		List<ControllerRegistry> controllers = new ArrayList<ControllerRegistry>();
+		Element controllersTag = DomUtils.getChildElementByTagName(element, "controllers");
+		if (controllersTag != null) {
+			String packageName = controllersTag.getAttribute("package");
+			List<Element> list = DomUtils.getChildElementsByTagName(controllersTag, "controller");
 			for (Element controller : list) {
-				String clazz = packageName + "." + controller.getAttribute("class");
-				if (clazzList.contains(clazz)) {
-					System.err.println("duplicate controller '" + clazz + "'");
-					System.exit(-1);
-				} else {
-					String method = controller.getAttribute("method");
-					String uriptn = controller.getAttribute("uriptn");
-					addRegistry(clazz, method, uriptn);
-				}
+				String className = packageName + "." + controller.getAttribute("class");
+				String method = controller.getAttribute("method");
+				String uriPattern = controller.getAttribute("uriptn");
+				ControllerRegistry registry = new ControllerRegistry();
+				registry.setClassName(className);
+				registry.setMethod(method);
+				registry.setUriPattern(uriPattern);
+				controllers.add(registry);
 			}
 		}
+		builder.addPropertyValue("controllers", controllers);
 
-		Element autoScan = DomUtils.getChildElementByTagName(element, "controllers-auto-scan");
-		if (autoScan != null) {
-			String packageName = autoScan.getAttribute("package");
-			ControllerScanner controllerScanner = new ControllerScanner();
-			controllerScanner.scan(packageName);
-			List<Element> list = DomUtils.getChildElementsByTagName(autoScan, "filter");
+		Element autoScanTag = DomUtils.getChildElementByTagName(element, "controllers-auto-scan");
+		if (autoScanTag != null) {
+			String packageName = autoScanTag.getAttribute("package");
+			builder.addPropertyValue("autoScanPackage", packageName);
+			List<String> filters = new ArrayList<String>();
+			List<Element> list = DomUtils.getChildElementsByTagName(autoScanTag, "filter");
 			for (Element filter : list) {
 				String name = filter.getAttribute("name");
-				ControllerRegistry r = controllerScanner.getFilter(name);
-				if (r == null) {
-					System.err.println("no filter named '" + name + "'");
-					System.exit(-1);
-				} else if (clazzList.contains(r.getClassName())) {
-					System.err.println("duplicate filter '" + name + "'");
-					System.exit(-1);
-				} else {
-					addRegistry(r.getClassName(), r.getMethod(), r.getUriPattern());
-				}
+				filters.add(name);
 			}
-			for (ControllerRegistry r : controllerScanner.getHandlers()) {
-				addRegistry(r.getClassName(), r.getMethod(), r.getUriPattern());
-			}
+			builder.addPropertyValue("filters", filters);
 		}
 	}
 
 	@Override
 	protected Class<?> getBeanClass(Element element) {
-		return HapporWebserver.class;
-	}
-	
-	private void addBean(String name, String clazz) {
-		try {
-			BeanDefinitionBuilder beanDefinitionBuilder = BeanDefinitionBuilder
-					.rootBeanDefinition(Class.forName(clazz));
-			BeanDefinitionHolder holder = new BeanDefinitionHolder(
-					beanDefinitionBuilder.getBeanDefinition(), name, null);
-			registerBeanDefinition(holder, parserContext.getRegistry());
-		} catch (ClassNotFoundException e) {
-			e.printStackTrace();
-			System.exit(-1);
-		}
-	}
-	
-	private void addRegistry(String clazz, String method, String uriPattern) {
-		String name = "controllerRegistry#" + clazzList.size();
-		BeanDefinitionBuilder beanDefinitionBuilder = BeanDefinitionBuilder
-				.rootBeanDefinition(ControllerRegistry.class);
-		BeanDefinition beanDefinition = beanDefinitionBuilder.getBeanDefinition();
-		beanDefinition.getPropertyValues().addPropertyValue("className", clazz);
-		beanDefinition.getPropertyValues().addPropertyValue("method", method);
-		beanDefinition.getPropertyValues().addPropertyValue("uriPattern", uriPattern);
-		BeanDefinitionHolder holder = new BeanDefinitionHolder(
-				beanDefinition, name, null);
-		registerBeanDefinition(holder, parserContext.getRegistry());
-		addController(clazz);
-	}
-	
-	private void addController(String clazz) {
-		String name = "controller#" + clazzList.size();
-		try {
-			BeanDefinitionBuilder beanDefinitionBuilder = BeanDefinitionBuilder
-					.rootBeanDefinition(Class.forName(clazz));
-			BeanDefinition beanDefinition = beanDefinitionBuilder.getBeanDefinition();
-			beanDefinition.setScope("prototype");
-			BeanDefinitionHolder holder = new BeanDefinitionHolder(
-					beanDefinition, name, null);
-			registerBeanDefinition(holder, parserContext.getRegistry());
-			clazzList.add(clazz);
-		} catch (ClassNotFoundException e) {
-			e.printStackTrace();
-			System.exit(-1);
-		}
+		return HapporServerElement.class;
 	}
 	
 }

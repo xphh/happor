@@ -16,8 +16,12 @@ public class HapporAutomaticContext extends HapporManualContext {
 	}
 
 	public HapporAutomaticContext(String packageName) {
+		this(Thread.currentThread().getContextClassLoader(), packageName);
+	}
+
+	public HapporAutomaticContext(ClassLoader classLoader, String packageName) {
 		controllerScanner = new ControllerScanner();
-		controllerScanner.scan(packageName);
+		controllerScanner.scan(classLoader, packageName);
 		for (ControllerRegistry r : controllerScanner.getHandlers()) {
 			addController(r);
 		}
