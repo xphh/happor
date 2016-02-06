@@ -1,6 +1,6 @@
 package cn.lechange.happor.context;
 
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
@@ -17,12 +17,11 @@ public class HapporMultipleContext extends HapporContext {
 
 	private HapporWebserver server;
 	private HapporContext defaultContext;
-	private Map<String, HapporContext> pathContexts = new HashMap<String, HapporContext>();
+	private Map<String, HapporContext> pathContexts = new LinkedHashMap<String, HapporContext>();
 	
 	public HapporMultipleContext() {
 		server = new HapporWebserver();
-		server.setPathContexts(pathContexts);
-		setServer(server);
+		applyServer(server);
 		setWebserverHandler(new WebserverHandler() {
 
 			public void onInit(HapporWebserver server) {
@@ -60,6 +59,12 @@ public class HapporMultipleContext extends HapporContext {
 	
 	public void clearPath() {
 		pathContexts.clear();
+	}
+	
+	public void applyServer(HapporWebserver server) {
+		setServer(server);
+		server.loadContext(this);
+		server.setPathContexts(pathContexts);
 	}
 	
 	@Override

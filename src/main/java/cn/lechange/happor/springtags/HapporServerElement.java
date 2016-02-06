@@ -12,6 +12,7 @@ public class HapporServerElement {
 	private List<ControllerRegistry> controllers;
 	private String autoScanPackage;
 	private List<String> filters;
+	private String containerConfig;
 	
 	public HapporWebserver getServer() {
 		return server;
@@ -42,6 +43,12 @@ public class HapporServerElement {
 	}
 	public void setFilters(List<String> filters) {
 		this.filters = filters;
+	}
+	public String getContainerConfig() {
+		return containerConfig;
+	}
+	public void setContainerConfig(String containerConfig) {
+		this.containerConfig = containerConfig;
 	}
 
 }

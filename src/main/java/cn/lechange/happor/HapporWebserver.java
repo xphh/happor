@@ -1,6 +1,8 @@
 package cn.lechange.happor;
 
 import java.util.Map;
+import java.util.concurrent.locks.ReadWriteLock;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.ChannelFuture;
@@ -12,7 +14,11 @@ import io.netty.handler.codec.http.HttpRequest;
 import io.netty.handler.logging.LogLevel;
 import io.netty.handler.logging.LoggingHandler;
 
+import org.apache.log4j.BasicConfigurator;
+import org.apache.log4j.Level;
+import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
+import org.apache.log4j.helpers.NullEnumeration;
 
 import cn.lechange.happor.utils.AsyncHttpClient;
 
@@ -20,6 +26,13 @@ public class HapporWebserver {
 
 	private static Logger logger = Logger.getLogger(HapporWebserver.class);
 
+	static {
+		if (LogManager.getRootLogger().getAllAppenders() instanceof NullEnumeration) {
+			BasicConfigurator.configure();
+			LogManager.getRootLogger().setLevel(Level.INFO);
+		}
+	}
+	
 	private int port = 80;
 	private int executeThreads = 0;
 	private int maxHttpSize = 1000000;
@@ -50,14 +63,26 @@ public class HapporWebserver {
 		this.timeout = timeout;
 	}
 	
+	private ReadWriteLock contextLock = new ReentrantReadWriteLock();
+	
 	private Map<String, HapporContext> pathContexts;
 	private HapporContext context;
 	
+	public void loadContext(HapporContext context) {
+		contextLock.writeLock().lock();
+		this.context = context;
+		contextLock.writeLock().unlock();
+	}
+	
 	public void setPathContexts(Map<String, HapporContext> pathContexts) {
+		contextLock.writeLock().lock();
 		this.pathContexts = pathContexts;
+		contextLock.writeLock().unlock();
 	}
 	
 	public HapporContext getContext(HttpRequest request) {
+		contextLock.readLock().lock();
+		HapporContext retContext = context;
 		if (pathContexts != null) {
 			String uri = request.getUri();
 			for (Map.Entry<String, HapporContext> entry : pathContexts.entrySet()) {
@@ -66,11 +91,13 @@ public class HapporWebserver {
 				if (uri.startsWith("/" + path + "/")) {
 					logger.info("enter path: " + path);
 					request.setUri(uri.substring(1 + path.length()));
-					return ctx;
+					retContext = ctx;
+					break;
 				}
 			}
 		}
-		return context;
+		contextLock.readLock().unlock();
+		return retContext;
 	}
 	
 	private AsyncHttpClient asyncHttpClient;
@@ -84,9 +111,7 @@ public class HapporWebserver {
 		return asyncHttpClient;
 	}
 
-	public void startup(HapporContext ctx) {
-		context = ctx;
-		
+	public void startup() {
 		logger.info("HttpServer is starting...");
 		logger.info("port = " + port);
 		logger.info("timeout = " + timeout);
@@ -110,9 +135,11 @@ public class HapporWebserver {
 			ChannelFuture f = b.bind(port).sync(); // (7)
 			logger.info("HttpServer start OK!");
 			
-			WebserverHandler handler = context.getWebserverHandler();
-			if (handler != null) {
-				handler.onInit(this);
+			if (context != null) {
+				WebserverHandler handler = context.getWebserverHandler();
+				if (handler != null) {
+					handler.onInit(this);
+				}
 			}
 
 			// Wait until the server socket is closed.

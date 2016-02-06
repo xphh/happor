@@ -104,6 +104,13 @@ public class TagHapporServerParser extends AbstractSimpleBeanDefinitionParser {
 			}
 			builder.addPropertyValue("filters", filters);
 		}
+		
+		Element containerTag = DomUtils.getChildElementByTagName(element, "container");
+		if (containerTag != null) {
+			String config = containerTag.getAttribute("config");
+			builder.addPropertyValue("containerConfig", config);
+		}
+		
 	}
 
 	@Override

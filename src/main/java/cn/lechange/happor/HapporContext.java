@@ -3,12 +3,7 @@ package cn.lechange.happor;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-import org.apache.log4j.BasicConfigurator;
-import org.apache.log4j.Level;
-import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
-import org.apache.log4j.helpers.NullEnumeration;
-
 import cn.lechange.happor.annotation.Controller;
 import cn.lechange.happor.controller.HttpController;
 
@@ -20,13 +15,6 @@ public abstract class HapporContext {
 	private Map<String, ControllerRegistry> controllers = new LinkedHashMap<String, ControllerRegistry>();
 	private WebserverHandler webserverHandler;
 
-	static {
-		if (LogManager.getRootLogger().getAllAppenders() instanceof NullEnumeration) {
-			BasicConfigurator.configure();
-			LogManager.getRootLogger().setLevel(Level.INFO);
-		}
-	}
-	
 	public void printInfo() {
 		logger.info("HapporContext = " + this);
 		for (Map.Entry<String, ControllerRegistry> entry : controllers
@@ -39,7 +27,8 @@ public abstract class HapporContext {
 
 	public void runServer() {
 		printInfo();
-		server.startup(this);
+		server.loadContext(this);
+		server.startup();
 	}
 
 	public HapporContext setServer(HapporWebserver server) {

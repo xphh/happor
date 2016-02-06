@@ -10,28 +10,8 @@
 		http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-3.0.xsd
 		http://happor.lechange.cn/schema/tags http://happor.lechange.cn/schema/tags/springtags.xsd">
 
-	<context:annotation-config />
-
-	<!-- happor webserver -->
 	<happor:server port="9080" timeout="30" maxHttpSize="1000000" executeThreads="32">
-		<happor:handler class="cn.lechange.happor.TestWebserverHandler" />
-		<!-- basiclly you can use happor:controllers -->
-		<!--
-		<happor:controllers package="cn.lechange.happor.controllers">
-			<happor:controller class="TestIncomingFilter" />
-			<happor:controller class="TestNormalHandler" method="GET" uriptn="^/test/(\w+)" />
-			<happor:controller class="TestAsyncHandler" method="GET" uriptn="^/async" />
-			<happor:controller class="TestTransitHandler" uriptn="^/trans" />
-			<happor:controller class="DefaultHandler" />
-		</happor:controllers>
-		-->
-		<!-- or you can use happor:controllers-auto-scan for more convenience
-		     NOTICE: must set the annotation on the controller classes! -->
-		<happor:controllers-auto-scan package="cn.lechange.happor.controllers">
-		    <happor:filter name="incoming" />
-		</happor:controllers-auto-scan>
+	    <happor:container config="conf/containerConfig.xml" />
 	</happor:server>
-
-	<!-- other beans here -->
 
 </beans>

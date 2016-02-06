@@ -18,6 +18,7 @@
 						<xsd:element ref="handler" minOccurs="0" maxOccurs="1" />
 						<xsd:element ref="controllers" minOccurs="0" maxOccurs="1" />
 						<xsd:element ref="controllers-auto-scan" minOccurs="0" maxOccurs="1" />
+						<xsd:element ref="container" minOccurs="0" maxOccurs="1" />
 					</xsd:sequence>
 					<xsd:attribute name="port" type="xsd:int" use="optional" default="80" />
 					<xsd:attribute name="timeout" type="xsd:int" use="optional" default="30" />
@@ -97,6 +98,19 @@
 			<xsd:complexContent>
 				<xsd:extension base="beans:identifiedType">
 					<xsd:attribute name="name" type="xsd:string" use="required" />
+				</xsd:extension>
+			</xsd:complexContent>
+		</xsd:complexType>
+	</xsd:element>
+	
+	<xsd:element name="container">
+		<xsd:annotation>
+			<xsd:documentation>webserver container</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexType>
+			<xsd:complexContent>
+				<xsd:extension base="beans:identifiedType">
+					<xsd:attribute name="config" type="xsd:string" use="required" />
 				</xsd:extension>
 			</xsd:complexContent>
 		</xsd:complexType>
