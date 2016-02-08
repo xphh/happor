@@ -11,7 +11,8 @@
 		http://happor.lechange.cn/schema/tags http://happor.lechange.cn/schema/tags/springtags.xsd">
 
 	<happor:server port="9080" timeout="30" maxHttpSize="1000000" executeThreads="32">
-	    <happor:container config="conf/containerConfig.xml" />
+	    <happor:config type="log4j" file="conf/log4j.properties" />
+	    <happor:config type="container" file="conf/container.properties" />
 	</happor:server>
 
 </beans>

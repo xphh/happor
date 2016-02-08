@@ -1,18 +1,19 @@
 package cn.lechange.happor.springtags;
 
 import java.util.List;
+import java.util.Map;
 
 import cn.lechange.happor.ControllerRegistry;
 import cn.lechange.happor.HapporWebserver;
 
 public class HapporServerElement {
-
+	
 	private HapporWebserver server;
 	private String handlerClass;
 	private List<ControllerRegistry> controllers;
 	private String autoScanPackage;
 	private List<String> filters;
-	private String containerConfig;
+	private Map<String, String> configs;
 	
 	public HapporWebserver getServer() {
 		return server;
@@ -44,11 +45,11 @@ public class HapporServerElement {
 	public void setFilters(List<String> filters) {
 		this.filters = filters;
 	}
-	public String getContainerConfig() {
-		return containerConfig;
+	public Map<String, String> getConfigs() {
+		return configs;
 	}
-	public void setContainerConfig(String containerConfig) {
-		this.containerConfig = containerConfig;
+	public void setConfigs(Map<String, String> configs) {
+		this.configs = configs;
 	}
 
 }

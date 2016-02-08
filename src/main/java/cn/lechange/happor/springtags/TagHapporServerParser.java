@@ -4,7 +4,9 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Properties;
 
 import org.springframework.beans.factory.support.AbstractBeanDefinition;
@@ -105,11 +107,14 @@ public class TagHapporServerParser extends AbstractSimpleBeanDefinitionParser {
 			builder.addPropertyValue("filters", filters);
 		}
 		
-		Element containerTag = DomUtils.getChildElementByTagName(element, "container");
-		if (containerTag != null) {
-			String config = containerTag.getAttribute("config");
-			builder.addPropertyValue("containerConfig", config);
+		Map<String, String> configs = new HashMap<String, String>();
+		List<Element> configTagList = DomUtils.getChildElementsByTagName(element, "config");
+		for (Element configTag : configTagList) {
+			String type = configTag.getAttribute("type");
+			String file = configTag.getAttribute("file");
+			configs.put(type, file);
 		}
+		builder.addPropertyValue("configs", configs);
 		
 	}
 
