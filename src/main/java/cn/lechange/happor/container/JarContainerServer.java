@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -76,16 +77,21 @@ public class JarContainerServer {
 	public static final String LOAD_LOG = "logs/load.log";
 	private void logLoad() {
 		FileWriter writer = null;
+		PrintWriter out = null;
 		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS");
 		try {
 			writer = new FileWriter(LOAD_LOG, true);
-			writer.write("Loaded at " + sdf.format(new Date()));
+			out = new PrintWriter(writer);    
+			out.println("Loaded at " + sdf.format(new Date()));
 		} catch (IOException e) {
 			logger.error(e.getMessage());
 		} finally {
 			try {
 				if (writer != null) {
 					writer.close();
+				}
+				if (out != null) {
+					out.close();
 				}
 			} catch (IOException e) {
 				logger.error(e.getMessage());
