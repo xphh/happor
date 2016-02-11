@@ -2,8 +2,11 @@ package cn.lechange.happor.container;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileWriter;
 import java.io.IOException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Properties;
 import java.util.Timer;
@@ -37,6 +40,10 @@ public class JarContainerServer {
 		serverContext.close();
 	}
 	
+	public String getContainerConfig() {
+		return containerConfig;
+	}
+	
 	private void readContainerConfig(String filename) {
 		FileInputStream in = null;
 		try {
@@ -66,6 +73,26 @@ public class JarContainerServer {
 		}
 	}
 	
+	public static final String LOAD_LOG = "logs/load.log";
+	private void logLoad() {
+		FileWriter writer = null;
+		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS");
+		try {
+			writer = new FileWriter(LOAD_LOG, true);
+			writer.write("Loaded at " + sdf.format(new Date()));
+		} catch (IOException e) {
+			logger.error(e.getMessage());
+		} finally {
+			try {
+				if (writer != null) {
+					writer.close();
+				}
+			} catch (IOException e) {
+				logger.error(e.getMessage());
+			}
+		}
+	}
+	
 	public void load() {
 		readContainerConfig(containerConfig);
 		HapporMultipleContext context = new HapporMultipleContext();
@@ -86,6 +113,8 @@ public class JarContainerServer {
 		}
 		context.printInfo();
 		context.applyServer(server);
+		
+		logLoad();
 		
 		WebserverHandler handler = context.getWebserverHandler();
 		if (handler != null) {
@@ -138,13 +167,4 @@ public class JarContainerServer {
 		context.runServer();
 	}
 	
-	/**
-	 * @param args
-	 */
-	public static void main(String[] args) {
-		// TODO Auto-generated method stub
-		JarContainerServer server = new JarContainerServer("conf/containerServer.xml");
-		server.start();
-	}
-
 }

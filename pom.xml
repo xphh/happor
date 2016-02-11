@@ -54,9 +54,10 @@
 						<manifest>
 							<addClasspath>true</addClasspath>
 							<classpathPrefix>lib</classpathPrefix>
-							<mainClass>cn.lechange.happor.container.JarContainerServer</mainClass>
+							<mainClass>cn.lechange.happor.container.ServerMain</mainClass>
 						</manifest>
 					</archive>
+					<outputDirectory>${project.build.directory}/package</outputDirectory>
 				</configuration>
 			</plugin>
 			<plugin>
@@ -70,7 +71,7 @@
 							<goal>copy-dependencies</goal>
 						</goals>
 						<configuration>
-							<outputDirectory>${project.build.directory}/lib</outputDirectory>
+							<outputDirectory>${project.build.directory}/package/lib</outputDirectory>
 						</configuration>
 					</execution>
 				</executions>
@@ -81,6 +82,39 @@
 				<configuration>
 					<skip>true</skip>
 				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-antrun-plugin</artifactId>
+				<version>1.6</version>
+				<executions>
+					<execution>
+						<id>copy-files</id>
+						<phase>package</phase>
+						<configuration>
+							<target>
+								<copy file="conf/containerServer.xml"
+									tofile="${project.build.directory}/package/conf/containerServer.xml"
+									overwrite="true" />
+								<copy file="conf/container.properties"
+									tofile="${project.build.directory}/package/conf/container.properties"
+									overwrite="true" />
+								<copy file="conf/log4j.properties"
+									tofile="${project.build.directory}/package/conf/log4j.properties"
+									overwrite="true" />
+								<copy file="bin/server.bat"
+									tofile="${project.build.directory}/package/server.bat"
+									overwrite="true" />
+								<copy file="bin/server.sh"
+									tofile="${project.build.directory}/package/server.sh"
+									overwrite="true" />
+							</target>
+						</configuration>
+						<goals>
+							<goal>run</goal>
+						</goals>
+					</execution>
+				</executions>
 			</plugin>
 		</plugins>
 	</build>
