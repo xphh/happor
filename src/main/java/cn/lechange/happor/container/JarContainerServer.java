@@ -124,6 +124,20 @@ public class JarContainerServer {
 		
 	};
 	
+	public static void runDebug(String path, Class<?> clazz) {
+		HapporContext jarContext = JarImporter.loadLocal(clazz);
+		if (jarContext == null) {
+			return;
+		}
+		HapporMultipleContext context = new HapporMultipleContext();
+		if (path.isEmpty()) {
+			context.setDefault(jarContext);
+		} else {
+			context.addPath(path, jarContext);
+		}
+		context.runServer();
+	}
+	
 	/**
 	 * @param args
 	 */

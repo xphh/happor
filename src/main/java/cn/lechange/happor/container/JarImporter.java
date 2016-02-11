@@ -16,7 +16,22 @@ public class JarImporter {
 	private static Logger logger = Logger.getLogger(JarImporter.class);
 
 	public static interface JarStub {
-		public HapporContext init(ClassLoader classLoader);
+		public HapporContext init(ClassLoader classLoader, String jarPath);
+	}
+	
+	public static HapporContext loadLocal(Class<?> clazz) {
+		try {
+			JarStub stub = (JarStub) clazz.newInstance();
+			HapporContext jarContext = stub.init(Thread.currentThread().getContextClassLoader(), "");
+			if (jarContext == null) {
+				logger.error("cannot get jar context!");
+				return null;
+			}
+			return jarContext;
+		} catch (Exception e) {
+			logger.error(e);
+			return null;
+		}
 	}
 
 	public static HapporContext load(String filename) {
@@ -37,7 +52,7 @@ public class JarImporter {
 				if (JarStub.class.isAssignableFrom(clazz)) {
 					logger.info("JarStub: " + name);
 					JarStub stub = (JarStub) clazz.newInstance();
-					jarContext = stub.init(classLoader);
+					jarContext = stub.init(classLoader, file.getParent());
 					if (jarContext == null) {
 						logger.error("cannot get jar context!");
 						return null;
