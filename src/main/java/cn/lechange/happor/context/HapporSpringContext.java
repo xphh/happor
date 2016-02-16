@@ -5,6 +5,7 @@ import org.springframework.beans.factory.NoSuchBeanDefinitionException;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
 import org.springframework.beans.factory.support.BeanDefinitionRegistry;
+import org.springframework.beans.factory.xml.XmlBeanDefinitionReader;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.FileSystemXmlApplicationContext;
 
@@ -27,10 +28,17 @@ public class HapporSpringContext extends HapporContext {
 		this(Thread.currentThread().getContextClassLoader(), filename);
 	}
 
-	public HapporSpringContext(ClassLoader classLoader, String filename) {
+	public HapporSpringContext(final ClassLoader classLoader, String filename) {
 		this.classLoader = classLoader;
 		
-		ctx = new FileSystemXmlApplicationContext(filename);
+		ctx = new FileSystemXmlApplicationContext(filename) {
+			@Override
+			protected void initBeanDefinitionReader(XmlBeanDefinitionReader reader) {
+	            super.initBeanDefinitionReader(reader);
+	            reader.setBeanClassLoader(classLoader);
+	            setClassLoader(classLoader);
+			}
+		};
 		
 		registerAllBeans();
 
